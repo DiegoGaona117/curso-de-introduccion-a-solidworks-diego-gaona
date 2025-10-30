@@ -1,0 +1,772 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma de Cursos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .sidebar {
+            width: 320px;
+            background: #f5f5f5;
+            border-right: 1px solid #ddd;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar.mobile-hidden {
+            transform: translateX(-100%);
+        }
+
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .mobile-overlay.active {
+            display: block;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .menu-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                transform: translateX(-100%);
+            }
+
+            .sidebar.mobile-open {
+                transform: translateX(0);
+                box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+            }
+
+            .menu-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .main-content {
+                width: 100%;
+            }
+
+            .top-bar {
+                justify-content: flex-start;
+            }
+        }
+
+        .sidebar-header {
+            background: #2563eb;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-header h2 {
+            font-size: 18px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .section-title {
+            padding: 15px 20px 10px;
+            font-weight: bold;
+            color: #333;
+            font-size: 14px;
+            background: #e5e5e5;
+            margin-top: 10px;
+        }
+
+        .section-title:first-of-type {
+            margin-top: 0;
+        }
+
+        .lesson-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: background 0.2s;
+        }
+
+        .lesson-item:hover {
+            background: #e8e8e8;
+        }
+
+        .lesson-item.active {
+            background: #dbeafe;
+            border-left: 4px solid #2563eb;
+        }
+
+        .lesson-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #666;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .lesson-checkbox.completed {
+            background: #22c55e;
+            border-color: #22c55e;
+        }
+
+        .lesson-checkbox.completed::after {
+            content: '✓';
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .lesson-info {
+            flex: 1;
+        }
+
+        .lesson-title {
+            font-size: 14px;
+            margin-bottom: 4px;
+            color: #333;
+        }
+
+        .lesson-duration {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .top-bar {
+            background: #2563eb;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .top-bar {
+                padding: 12px 15px;
+            }
+
+            .nav-buttons {
+                flex-wrap: wrap;
+                gap: 8px;
+                width: 100%;
+            }
+
+            .btn {
+                padding: 8px 12px;
+                font-size: 13px;
+                flex: 1;
+                min-width: 120px;
+                justify-content: center;
+            }
+
+            .btn-enroll {
+                width: 100%;
+                justify-content: center;
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: opacity 0.2s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #2563eb;
+        }
+
+        .btn-enroll {
+            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+            transition: all 0.3s;
+            animation: pulse 2s infinite;
+        }
+
+        .btn-enroll:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6);
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+            }
+            50% {
+                box-shadow: 0 4px 25px rgba(239, 68, 68, 0.7);
+            }
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            background: white;
+        }
+
+        @media (max-width: 768px) {
+            .content-area {
+                padding: 20px 15px;
+            }
+        }
+
+        .lesson-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .lesson-content h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #1e40af;
+        }
+
+        @media (max-width: 768px) {
+            .lesson-content h1 {
+                font-size: 22px;
+            }
+        }
+
+        .video-container {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .lesson-description {
+            line-height: 1.6;
+            color: #444;
+            margin-bottom: 20px;
+        }
+
+        .quiz-container {
+            background: #f0f9ff;
+            border: 2px solid #2563eb;
+            border-radius: 8px;
+            padding: 30px;
+            margin-top: 20px;
+        }
+
+        .quiz-container h3 {
+            color: #2563eb;
+            margin-bottom: 15px;
+        }
+
+        .pdf-download-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 40px;
+            margin: 30px 0;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .pdf-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .pdf-download-section h2 {
+            color: white;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        .pdf-download-section p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+
+        .btn-download {
+            background: white;
+            color: #667eea;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-download:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            background: #f0f0f0;
+        }
+
+        .btn-download:active {
+            transform: translateY(-1px);
+        }
+
+        .pdf-info {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 25px;
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        .pdf-info strong {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-overlay" id="mobile-overlay"></div>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>📚 Curso de Solidworks</h2>
+            <button class="icon-btn">⚙️</button>
+        </div>
+
+        <div id="lessons-container"></div>
+    </div>
+
+    <div class="main-content">
+        <div class="top-bar">
+            <button class="menu-toggle" id="menu-toggle" title="Menú de clases">
+                ☰ Clases
+            </button>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" id="prev-btn">
+                    ← Clase anterior
+                </button>
+                <button class="btn btn-primary" id="next-btn">
+                    Completar y continuar →
+                </button>
+                <button class="btn-enroll" id="enroll-btn">
+                    🚀 ¡Inscríbete al Curso Completo!
+                </button>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div class="lesson-content" id="lesson-content">
+                <!-- Content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const lessons = [
+            // Introducción al curso
+            { id: 0, title: "Crear mi primer documento", duration: "5:30", section: "Introducción al curso", type: "video", videoUrl: "https://youtu.be/pgx4n4zaFbg" },
+            { id: 1, title: "Sistema de Unidades", duration: "4:15", section: "Introducción al curso", type: "video", videoUrl: "https://youtu.be/nZ4mgWaGEos" },
+            { id: 2, title: "Herramienta vistas estándar", duration: "6:20", section: "Introducción al curso", type: "video", videoUrl: "https://youtu.be/DyEIqnQU-iQ" },
+            { id: 3, title: "Planos base", duration: "5:45", section: "Introducción al curso", type: "video", videoUrl: "https://youtu.be/q76vD3hjaQE" },
+            { id: 5, title: "Mover / Girar / Acercar / Alejar pieza", duration: "7:10", section: "Introducción al curso", type: "video", videoUrl: "https://youtu.be/JUiz57Hbims" },
+            { id: 6, title: "Centrar la pieza", duration: "4:30", section: "Introducción al curso", type: "video", videoUrl: "https://youtu.be/KM20kOCLB2I" },
+            { id: 7, title: "Forma de trabajo con solidworks", duration: "8:20", section: "Introducción al curso", type: "video", videoUrl: "https://youtu.be/pgx4n4zaFbg" },
+            { id: 8, title: "Contrl + Z deshacer", duration: "3:45", section: "Introducción al curso", type: "video", videoUrl: "https://youtu.be/F_AlgSZDyJM" },
+            { id: 9, title: "Desactivar herramientas / Tecla de escape", duration: "4:15", section: "Introducción al curso", type: "video", videoUrl: "https://youtu.be/xE4ULoT0wRY" },
+            { id: 10, title: "Eliminar dibujos", duration: "3:30", section: "Introducción al curso", type: "video", videoUrl: "https://youtu.be/T6FpWEMuzJo" },
+            { id: 11, title: "Modificar / Eliminar cotas", duration: "5:50", section: "Introducción al curso", type: "video", videoUrl: "https://youtu.be/0Y9dBYSjteQ" },
+            { id: 12, title: "Alinear vista de la pieza / Normal A", duration: "4:40", section: "Introducción al curso", type: "video", videoUrl: "https://youtu.be/MLXYbt2HwEA" },
+            { id: 13, title: "Guardar la pieza", duration: "5:10", section: "Introducción al curso", type: "video", videoUrl: "https://youtu.be/nX_GCw7dd0c" },
+            { id: 14, title: "Abrir la pieza", duration: "3:20", section: "Introducción al curso", type: "video", videoUrl: "https://youtu.be/uFolpBsLxz8" },
+            
+            // Práctica 1
+            { id: 16, title: "Práctica 1", duration: "12:30", section: "Práctica 1", type: "video", videoUrl: "https://youtu.be/E0bQ6NSYrs8" },
+            { id: 17, title: "Agregar material y comprobar pieza", duration: "6:15", section: "Práctica 1", type: "video", videoUrl: "https://youtu.be/X-KkSMIvIAE" },
+            { id: 18, title: "PDF Ejercicio 1", duration: "PDF", section: "Práctica 1", type: "pdf", pdfUrl: "https://drive.google.com/file/d/1ojnSYx2EgoCUFOdZ31K396L1hzfv-sXA/view?usp=drive_link" },
+            { id: 19, title: "Solución Ejercicio 1", duration: "10:45", section: "Práctica 1", type: "video", videoUrl: "https://youtu.be/yIjq9lYQfDM" },
+            { id: 20, title: "PDF Ejercicio 1.1", duration: "PDF", section: "Práctica 1", type: "pdf", pdfUrl: "https://drive.google.com/file/d/1ztgXBJzrOF5LKthhoTga1NXj_t8EpNdK/view?usp=drive_link" },
+            { id: 21, title: "Solución ejercicio 1.1", duration: "11:20", section: "Práctica 1", type: "video", videoUrl: "https://youtu.be/8l6T9cgsaJw" },
+            
+            // Clases complementarias
+            { id: 22, title: "¿Por que mi solidworks no dibuja?", duration: "5:40", section: "Clases complementarias", type: "video", videoUrl: "https://youtu.be/eNarirQQ0JM" },
+            { id: 23, title: "Activar enganche", duration: "4:25", section: "Clases complementarias", type: "video", videoUrl: "https://youtu.be/vlKhckwghLc" },
+            { id: 24, title: "Relaciones automáticas", duration: "6:50", section: "Clases complementarias", type: "video", videoUrl: "https://youtu.be/qsxyFGUXnAQ" },
+            { id: 25, title: "Se descompuso mi área de trabajo 😢", duration: "5:15", section: "Clases complementarias", type: "video", videoUrl: "https://youtu.be/vdQyqtEOJ_A" },
+            { id: 26, title: "Administrador de propiedades fuera de lugar", duration: "4:30", section: "Clases complementarias", type: "video", videoUrl: "https://youtu.be/Vyth7KDTkP8" },
+            { id: 27, title: "Se ocultan las herramientas y solo se ven las pestañas", duration: "5:55", section: "Clases complementarias", type: "video", videoUrl: "https://youtu.be/b-_KqxLHLy0" },
+            
+            // Práctica 2
+            { id: 28, title: "Práctica 2", duration: "14:20", section: "Práctica 2", type: "video", videoUrl: "https://youtu.be/pvJ0jvtru9Y" },
+            { id: 29, title: "PDF Ejercicio 2", duration: "PDF", section: "Práctica 2", type: "pdf", pdfUrl: "https://drive.google.com/file/d/1vqYj1dlhUKHgCUDJ57ToeLrAFWDu-EaG/view?usp=drive_link" },
+            { id: 30, title: "Solución ejercicio 2", duration: "12:15", section: "Práctica 2", type: "video", videoUrl: "https://youtu.be/Zw4VO5Wsguk" },
+            { id: 31, title: "PDF Ejercicio 2.1", duration: "PDF", section: "Práctica 2", type: "pdf", pdfUrl: "https://drive.google.com/file/d/1VRLo6jF5lqOJ7pC2r5wlpu7VdAxH_wOp/view?usp=drive_link" },
+            { id: 32, title: "Solución Ejercico 2.1", duration: "13:40", section: "Práctica 2", type: "video", videoUrl: "https://youtu.be/7Cy1EWJX0CI" },
+            
+            // Práctica 3
+            { id: 33, title: "Práctica 3", duration: "15:30", section: "Práctica 3", type: "video", videoUrl: "https://youtu.be/nlzz0jlvx_Y" },
+            { id: 34, title: "PDF Ejercicio 3", duration: "PDF", section: "Práctica 3", type: "pdf", pdfUrl: "https://drive.google.com/file/d/1QTm0Z8sawlXUuVP47SD56_iw2IsgbBGk/view?usp=drive_link" },
+            { id: 35, title: "Solución ejercicio 3", duration: "14:20", section: "Práctica 3", type: "video", videoUrl: "https://youtu.be/z0vw6aoLplk" },
+            { id: 36, title: "PDF Ejercicio 3.1", duration: "PDF", section: "Práctica 3", type: "pdf", pdfUrl: "https://drive.google.com/file/d/1nKfM8nbqUMjh6cM7sTeKblqWvOn_4wpL/view?usp=drive_link" },
+            { id: 37, title: "Solución ejercicio 3.1", duration: "13:55", section: "Práctica 3", type: "video", videoUrl: "https://youtu.be/2jACMV3rfSo" },
+            { id: 39, title: "PDF PTR 3x2", duration: "PDF", section: "Práctica 3", type: "pdf", pdfUrl: "https://drive.google.com/file/d/1zhfGwTkopxCe03loS0kNkS8r93dV8rXv/view?usp=drive_link" },
+            { id: 41, title: "Solución PTR 3x2", duration: "16:30", section: "Práctica 3", type: "video", videoUrl: "https://youtu.be/11hCwu_tOB0" }
+        ];
+
+        // Load progress from localStorage
+        function loadProgress() {
+            try {
+                const savedLesson = localStorage.getItem('solidworks_currentLesson');
+                const savedCompleted = localStorage.getItem('solidworks_completedLessons');
+                
+                console.log('Cargando progreso:', savedLesson, savedCompleted);
+                
+                return {
+                    currentLesson: savedLesson ? parseInt(savedLesson) : 0,
+                    completedLessons: savedCompleted ? new Set(JSON.parse(savedCompleted)) : new Set()
+                };
+            } catch (error) {
+                console.error('Error cargando progreso:', error);
+                return {
+                    currentLesson: 0,
+                    completedLessons: new Set()
+                };
+            }
+        }
+
+        // Save progress to localStorage
+        function saveProgress() {
+            try {
+                localStorage.setItem('solidworks_currentLesson', currentLesson.toString());
+                const completedArray = Array.from(completedLessons);
+                localStorage.setItem('solidworks_completedLessons', JSON.stringify(completedArray));
+                console.log('Progreso guardado:', currentLesson, completedArray);
+            } catch (error) {
+                console.error('Error guardando progreso:', error);
+            }
+        }
+
+        const progress = loadProgress();
+        let currentLesson = progress.currentLesson;
+        let completedLessons = progress.completedLessons;
+
+        function renderSidebar() {
+            const container = document.getElementById('lessons-container');
+            container.innerHTML = '';
+            
+            let currentSection = '';
+            
+            lessons.forEach((lesson, index) => {
+                if (lesson.section !== currentSection) {
+                    const sectionTitle = document.createElement('div');
+                    sectionTitle.className = 'section-title';
+                    sectionTitle.textContent = lesson.section;
+                    container.appendChild(sectionTitle);
+                    currentSection = lesson.section;
+                }
+
+                const lessonItem = document.createElement('div');
+                lessonItem.className = `lesson-item ${index === currentLesson ? 'active' : ''}`;
+                
+                lessonItem.innerHTML = `
+                    <div class="lesson-checkbox ${completedLessons.has(index) ? 'completed' : ''}" data-lesson="${index}"></div>
+                    <div class="lesson-info">
+                        <div class="lesson-title">${lesson.title}</div>
+                        <div class="lesson-duration">${lesson.duration}</div>
+                    </div>
+                `;
+                
+                lessonItem.addEventListener('click', (e) => {
+                    if (!e.target.classList.contains('lesson-checkbox')) {
+                        currentLesson = index;
+                        saveProgress();
+                        renderSidebar();
+                        renderContent();
+                    }
+                });
+
+                const checkbox = lessonItem.querySelector('.lesson-checkbox');
+                checkbox.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleComplete(index);
+                });
+                
+                container.appendChild(lessonItem);
+            });
+        }
+
+        function toggleComplete(lessonId) {
+            if (completedLessons.has(lessonId)) {
+                completedLessons.delete(lessonId);
+            } else {
+                completedLessons.add(lessonId);
+            }
+            saveProgress();
+            renderSidebar();
+        }
+
+        function getYouTubeEmbedUrl(url) {
+            if (!url) return null;
+            
+            // Extraer el ID del video de diferentes formatos de URL de YouTube
+            let videoId = null;
+            
+            // Formato: https://www.youtube.com/watch?v=VIDEO_ID
+            if (url.includes('youtube.com/watch?v=')) {
+                videoId = url.split('watch?v=')[1].split('&')[0];
+            }
+            // Formato: https://youtu.be/VIDEO_ID
+            else if (url.includes('youtu.be/')) {
+                videoId = url.split('youtu.be/')[1].split('?')[0];
+            }
+            // Formato: ya es un embed
+            else if (url.includes('youtube.com/embed/')) {
+                return url;
+            }
+            
+            return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+        }
+
+        function renderContent() {
+            const content = document.getElementById('lesson-content');
+            const lesson = lessons[currentLesson];
+            
+            if (lesson.type === 'quiz') {
+                content.innerHTML = `
+                    <h1>📝 ${lesson.title}</h1>
+                    <div class="quiz-container">
+                        <h3>📝 Cuestionario</h3>
+                        <p>Este es un cuestionario para evaluar tus conocimientos sobre los temas vistos anteriormente.</p>
+                        <p style="margin-top: 15px;"><strong>Preguntas:</strong> 5-10</p>
+                        <p><strong>Tiempo estimado:</strong> 10-15 minutos</p>
+                    </div>
+                `;
+            } else if (lesson.type === 'pdf') {
+                const hasPdfUrl = lesson.pdfUrl && lesson.pdfUrl !== 'URL_DE_TU_PDF_AQUI';
+                
+                content.innerHTML = `
+                    <h1>📄 ${lesson.title}</h1>
+                    <div class="pdf-download-section">
+                        <div class="pdf-icon">📄</div>
+                        <h2>Material de Ejercicios</h2>
+                        <p>Descarga el PDF y crea la pieza en tu programa de solidworks</p>
+                        ${hasPdfUrl ? `
+                            <button class="btn-download" onclick="window.open('${lesson.pdfUrl}', '_blank')">
+                                <span>⬇️</span>
+                                <span>Descargar PDF</span>
+                            </button>
+                            <div class="pdf-info">
+                                <strong>📋 Contenido del PDF:</strong>
+                                Ejercicios prácticos y material de apoyo
+                            </div>
+                        ` : `
+                            <div class="pdf-info">
+                                <strong>⚠️ PDF próximamente disponible</strong>
+                                Este material estará disponible pronto
+                            </div>
+                        `}
+                    </div>
+                    <div class="lesson-description">
+                        <p>Este es un documento PDF con ejercicios prácticos y material de apoyo para tu aprendizaje.</p>
+                        <p style="margin-top: 15px;">Descarga el PDF para poder realizar los ejercicios prácticos correspondientes a esta lección.</p>
+                    </div>
+                `;
+            } else {
+                const embedUrl = getYouTubeEmbedUrl(lesson.videoUrl);
+                
+                if (embedUrl) {
+                    content.innerHTML = `
+                        <h1>${lesson.title}</h1>
+                        <div class="video-container" style="padding: 0; background: #000;">
+                            <iframe 
+                                width="100%" 
+                                height="100%" 
+                                src="${embedUrl}" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen
+                                style="border-radius: 8px;">
+                            </iframe>
+                        </div>
+                        <div class="lesson-description">
+                            <p>En esta clase aprenderás sobre ${lesson.title.toLowerCase()}. El contenido incluye explicaciones detalladas, ejemplos prácticos y ejercicios para reforzar tu aprendizaje.</p>
+                            <p style="margin-top: 15px;">Este video es parte de la sección: <strong>${lesson.section}</strong></p>
+                        </div>
+                    `;
+                } else {
+                    content.innerHTML = `
+                        <h1>${lesson.title}</h1>
+                        <div class="video-container">
+                            🎥 Video: ${lesson.duration}
+                        </div>
+                        <div class="lesson-description">
+                            <p>En esta clase aprenderás sobre ${lesson.title.toLowerCase()}. El contenido incluye explicaciones detalladas, ejemplos prácticos y ejercicios para reforzar tu aprendizaje.</p>
+                            <p style="margin-top: 15px;">Este video es parte de la sección: <strong>${lesson.section}</strong></p>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        document.getElementById('prev-btn').addEventListener('click', () => {
+            if (currentLesson > 0) {
+                currentLesson--;
+                saveProgress();
+                renderSidebar();
+                renderContent();
+            }
+        });
+
+        document.getElementById('next-btn').addEventListener('click', () => {
+            completedLessons.add(currentLesson);
+            if (currentLesson < lessons.length - 1) {
+                currentLesson++;
+            }
+            saveProgress();
+            renderSidebar();
+            renderContent();
+        });
+
+        document.getElementById('enroll-btn').addEventListener('click', () => {
+            //alert('¡Excelente decisión! 🎉\n\nSerás redirigido a la página de inscripción donde podrás acceder al curso completo con todos los beneficios.');
+            // Aquí puedes agregar la URL de tu página de pago o inscripción
+             window.location.href = 'https://cursodiegogaona.teachable.com/p/curso-de-solidworks-2020-preparate-para-cswa-diego-gaona-40';
+        });
+
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const mobileOverlay = document.getElementById('mobile-overlay');
+
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('mobile-open');
+            mobileOverlay.classList.toggle('active');
+        });
+
+        mobileOverlay.addEventListener('click', () => {
+            sidebar.classList.remove('mobile-open');
+            mobileOverlay.classList.remove('active');
+        });
+
+        // Close sidebar when clicking on a lesson (mobile)
+        document.getElementById('lessons-container').addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                setTimeout(() => {
+                    sidebar.classList.remove('mobile-open');
+                    mobileOverlay.classList.remove('active');
+                }, 300);
+            }
+        });
+
+        // Initialize
+        renderSidebar();
+        renderContent();
+    </script>
+</body>
+</html>
