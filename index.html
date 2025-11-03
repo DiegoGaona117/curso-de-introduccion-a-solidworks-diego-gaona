@@ -448,7 +448,6 @@
             opacity: 0.9;
         }
 
-        /* Nuevo estilo para el botón de PDF en videos */
         .video-pdf-download {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             border-radius: 12px;
@@ -494,7 +493,6 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
-        /* Mensaje motivacional debajo de videos */
         .motivation-message {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             border-radius: 12px;
@@ -520,7 +518,6 @@
             }
         }
 
-        /* Estilos para la página de felicitaciones */
         .congratulations-container {
             text-align: center;
             padding: 40px 20px;
@@ -806,9 +803,45 @@
             }
         }
 
+        // Función para obtener el ID de la lección desde la URL
+        function getLessonFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            const lessonId = params.get('leccion');
+            if (lessonId !== null) {
+                const id = parseInt(lessonId);
+                const lessonIndex = lessons.findIndex(l => l.id === id);
+                if (lessonIndex !== -1) {
+                    return lessonIndex;
+                }
+            }
+            return null;
+        }
+
+        // Función para actualizar la URL
+        function updateURL(lessonIndex) {
+            const lessonId = lessons[lessonIndex].id;
+            const newURL = `${window.location.pathname}?leccion=${lessonId}`;
+            window.history.pushState({ lessonIndex }, '', newURL);
+        }
+
         const progress = loadProgress();
         let currentLesson = progress.currentLesson;
         let completedLessons = progress.completedLessons;
+
+        // Cargar lección desde URL si existe
+        const urlLesson = getLessonFromURL();
+        if (urlLesson !== null) {
+            currentLesson = urlLesson;
+        }
+
+        // Manejar navegación del navegador (botones atrás/adelante)
+        window.addEventListener('popstate', (event) => {
+            if (event.state && event.state.lessonIndex !== undefined) {
+                currentLesson = event.state.lessonIndex;
+                renderSidebar();
+                renderContent();
+            }
+        });
 
         function renderSidebar() {
             const container = document.getElementById('lessons-container');
@@ -839,6 +872,7 @@
                 lessonItem.addEventListener('click', (e) => {
                     if (!e.target.classList.contains('lesson-checkbox')) {
                         currentLesson = index;
+                        updateURL(index);
                         saveProgress();
                         renderSidebar();
                         renderContent();
@@ -977,10 +1011,6 @@
                 const hasPdf = lesson.pdfUrl && lesson.pdfUrl !== null;
                 const hasMotivation = lesson.motivation;
                 
-                console.log('Lesson:', lesson.title);
-                console.log('Has motivation:', hasMotivation);
-                console.log('Motivation text:', lesson.motivation);
-                
                 if (embedUrl) {
                     let htmlContent = `
                         <h1>${lesson.title}</h1>
@@ -1063,6 +1093,7 @@
         document.getElementById('prev-btn').addEventListener('click', () => {
             if (currentLesson > 0) {
                 currentLesson--;
+                updateURL(currentLesson);
                 saveProgress();
                 renderSidebar();
                 renderContent();
@@ -1074,6 +1105,7 @@
             if (currentLesson < lessons.length - 1) {
                 currentLesson++;
             }
+            updateURL(currentLesson);
             saveProgress();
             renderSidebar();
             renderContent();
@@ -1108,6 +1140,11 @@
 
         renderSidebar();
         renderContent();
+        
+        // Actualizar la URL inicial si no hay parámetro en la URL
+        if (getLessonFromURL() === null) {
+            updateURL(currentLesson);
+        }
     </script>
 </body>
 </html>
