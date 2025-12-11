@@ -16,7 +16,6 @@
         'https://connect.facebook.net/en_US/fbevents.js');
         fbq('init', '373277814132384');
         fbq('track', 'PageView');
-        fbq('trackCustom', 'PDF_view');
     </script>
     <noscript>
         <img height="1" width="1" style="display:none"
@@ -721,7 +720,8 @@
     <script>
         const lessons = [
             // Introducción al curso
-            { id: 0, title: "Crear mi primer documento", duration: "5:30", section: "Introducción al curso", type: "video", videoUrl: "https://youtu.be/pgx4n4zaFbg", pdfUrl: null, motivation: "💼 Dominar SolidWorks puede aumentar tu salario hasta un 40%. ¡Cada clase te acerca a ese objetivo!" },            
+            { id: 0, title: "Crear mi primer documento", duration: "5:30", section: "Introducción al curso", type: "video", videoUrl: "https://youtu.be/pgx4n4zaFbg", pdfUrl: null, motivation: "💼 Dominar SolidWorks puede aumentar tu salario hasta un 40%. ¡Cada clase te acerca a ese objetivo!" },
+            { id: 999, title: "¿Aún no tienes instalado SolidWorks?", duration: "Importante", section: "Introducción al curso", type: "whatsapp", whatsappNumber: "5214621579719", whatsappMessage: "Hola profesor Diego, necesito ayuda para instalar SolidWorks, ¿Podría ayudarme?" },
             { id: 1, title: "Sistema de Unidades", duration: "4:15", section: "Introducción al curso", type: "video", videoUrl: "https://youtu.be/nZ4mgWaGEos", pdfUrl: null , motivation: "💰 Estas habilidades te abren puertas en industrias automotriz, aeroespacial y manufactura" },
             { id: 2, title: "Herramienta vistas estándar", duration: "6:20", section: "Introducción al curso", type: "video", videoUrl: "https://youtu.be/DyEIqnQU-iQ", pdfUrl: null, motivation: "🚀 Los diseñadores CAD están entre los profesionales más demandados del mercado" },
             { id: 3, title: "Planos base", duration: "5:45", section: "Introducción al curso", type: "video", videoUrl: "https://youtu.be/q76vD3hjaQE", pdfUrl: null , motivation: "📈 El conocimiento que estás adquiriendo vale más de lo que imaginas en el mercado laboral" },
@@ -773,7 +773,6 @@
             { id: 42, title: "🎉 ¡Felicidades por llegar hasta aquí!", duration: "Final", section: "Conclusión del curso", type: "congratulations" }
         ];
 
-        // Load progress
         function loadProgress() {
             try {
                 const savedLesson = localStorage.getItem('solidworks_currentLesson');
@@ -792,7 +791,6 @@
             }
         }
 
-        // Save progress
         function saveProgress() {
             try {
                 localStorage.setItem('solidworks_currentLesson', currentLesson.toString());
@@ -803,7 +801,6 @@
             }
         }
 
-        // Función para obtener el ID de la lección desde la URL
         function getLessonFromURL() {
             const params = new URLSearchParams(window.location.search);
             const lessonId = params.get('leccion');
@@ -817,7 +814,6 @@
             return null;
         }
 
-        // Función para actualizar la URL
         function updateURL(lessonIndex) {
             const lessonId = lessons[lessonIndex].id;
             const newURL = `${window.location.pathname}?leccion=${lessonId}`;
@@ -828,13 +824,11 @@
         let currentLesson = progress.currentLesson;
         let completedLessons = progress.completedLessons;
 
-        // Cargar lección desde URL si existe
         const urlLesson = getLessonFromURL();
         if (urlLesson !== null) {
             currentLesson = urlLesson;
         }
 
-        // Manejar navegación del navegador (botones atrás/adelante)
         window.addEventListener('popstate', (event) => {
             if (event.state && event.state.lessonIndex !== undefined) {
                 currentLesson = event.state.lessonIndex;
@@ -921,7 +915,82 @@
             const content = document.getElementById('lesson-content');
             const lesson = lessons[currentLesson];
             
-            if (lesson.type === 'congratulations') {
+            if (lesson.type === 'whatsapp') {
+                const whatsappUrl = `https://wa.me/${lesson.whatsappNumber}?text=${encodeURIComponent(lesson.whatsappMessage)}`;
+                
+                content.innerHTML = `
+                    <div style="max-width: 700px; margin: 0 auto; text-align: center;">
+                        <div style="font-size: 80px; margin-bottom: 20px;">💻</div>
+                        <h1 style="color: #2563eb; font-size: 32px; margin-bottom: 20px;">
+                            ¿Aún no tienes instalado SolidWorks?
+                        </h1>
+                        
+                        <p style="font-size: 18px; color: #666; line-height: 1.8; margin-bottom: 30px;">
+                            No te preocupes, puedo ayudarte con la instalación paso a paso. 
+                            Envíame un mensaje por WhatsApp y te guiaré en el proceso.
+                        </p>
+
+                        <div style="background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); 
+                                    border-radius: 16px; padding: 40px; margin: 40px 0; 
+                                    box-shadow: 0 10px 30px rgba(37, 211, 102, 0.3);">
+                            <div style="font-size: 60px; margin-bottom: 20px;">📱</div>
+                            <h2 style="color: white; font-size: 24px; margin-bottom: 15px;">
+                                Obtén Ayuda Personalizada
+                            </h2>
+                            <p style="color: rgba(255,255,255,0.9); font-size: 16px; margin-bottom: 30px;">
+                                Te enviaré información sobre la instalación y requisitos del sistema
+                            </p>
+                            <button id="whatsapp-btn" class="btn-download" style="background: white; color: #128C7E; 
+                                    padding: 18px 40px; font-size: 20px; cursor: pointer;">
+                                <span style="font-size: 24px;">💬</span>
+                                <span>Enviar mensaje de WhatsApp</span>
+                            </button>
+                        </div>
+
+                        <div style="background: #f0f9ff; border-radius: 12px; padding: 30px; text-align: left;">
+                            <h3 style="color: #2563eb; margin-bottom: 20px; text-align: center;">
+                                ✅ Lo que recibirás:
+                            </h3>
+                            <ul style="list-style: none; padding: 0;">
+                                <li style="padding: 12px 0; font-size: 16px; color: #444;">
+                                    <strong>✓</strong> Guía de instalación paso a paso
+                                </li>
+                                <li style="padding: 12px 0; font-size: 16px; color: #444;">
+                                    <strong>✓</strong> Requisitos del sistema
+                                </li>
+                                <li style="padding: 12px 0; font-size: 16px; color: #444;">
+                                    <strong>✓</strong> Soporte personalizado
+                                </li>
+                                <li style="padding: 12px 0; font-size: 16px; color: #444;">
+                                    <strong>✓</strong> Resolución de problemas comunes
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div style="margin-top: 40px; padding: 25px; background: #fff8e1; 
+                                    border-left: 4px solid #f59e0b; border-radius: 8px;">
+                            <p style="color: #666; font-size: 15px; line-height: 1.6; margin: 0;">
+                                💡 <strong>Tip:</strong> Si ya tienes SolidWorks instalado, 
+                                puedes continuar con la siguiente clase haciendo clic en el botón 
+                                "Completar y continuar" arriba.
+                            </p>
+                        </div>
+                    </div>
+                `;
+
+                setTimeout(() => {
+                    const whatsappBtn = document.getElementById('whatsapp-btn');
+                    if (whatsappBtn) {
+                        whatsappBtn.addEventListener('click', () => {
+                            if (typeof fbq !== 'undefined') {
+                                fbq('track', 'Contact');
+                                fbq('trackCustom', 'WhatsApp_Click');
+                            }
+                            window.open(whatsappUrl, '_blank');
+                        });
+                    }
+                }, 100);
+            } else if (lesson.type === 'congratulations') {
                 content.innerHTML = `
                     <div class="congratulations-container">
                         <div class="congrats-icon">🎉</div>
@@ -986,7 +1055,12 @@
                         <h2>Material de Ejercicios</h2>
                         <p>Descarga el PDF y crea la pieza en tu programa de solidworks</p>
                         ${hasPdfUrl ? `
-                            <button class="btn-download" onclick="window.open('${lesson.pdfUrl}', '_blank')">
+                            <button class="btn-download" onclick="
+                                if (typeof fbq !== 'undefined') {
+                                    fbq('trackCustom', 'PDF_Download');
+                                }
+                                window.open('${lesson.pdfUrl}', '_blank');
+                            ">
                                 <span>⬇️</span>
                                 <span>Descargar PDF</span>
                             </button>
@@ -1032,7 +1106,12 @@
                             <div class="video-pdf-download">
                                 <h3>📐 Plano de la Pieza</h3>
                                 <p>Descarga el PDF con el plano técnico de la pieza que se trabaja en este video</p>
-                                <button class="btn-download-small" onclick="window.open('${lesson.pdfUrl}', '_blank')">
+                                <button class="btn-download-small" onclick="
+                                    if (typeof fbq !== 'undefined') {
+                                        fbq('trackCustom', 'PDF_Download');
+                                    }
+                                    window.open('${lesson.pdfUrl}', '_blank');
+                                ">
                                     <span>📥</span>
                                     <span>Descargar Plano PDF</span>
                                 </button>
@@ -1062,7 +1141,12 @@
                             <div class="video-pdf-download">
                                 <h3>📐 Plano de la Pieza</h3>
                                 <p>Descarga el PDF con el plano técnico de la pieza que se trabaja en este video</p>
-                                <button class="btn-download-small" onclick="window.open('${lesson.pdfUrl}', '_blank')">
+                                <button class="btn-download-small" onclick="
+                                    if (typeof fbq !== 'undefined') {
+                                        fbq('trackCustom', 'PDF_Download');
+                                    }
+                                    window.open('${lesson.pdfUrl}', '_blank');
+                                ">
                                     <span>📥</span>
                                     <span>Descargar Plano PDF</span>
                                 </button>
@@ -1112,6 +1196,10 @@
         });
 
         document.getElementById('enroll-btn').addEventListener('click', () => {
+            if (typeof fbq !== 'undefined') {
+                fbq('track', 'Lead');
+                fbq('trackCustom', 'Course_Enroll_Click');
+            }
             window.open('https://cursodiegogaona.teachable.com/p/curso-de-solidworks-2020-preparate-para-cswa-diego-gaona-40', '_blank');
         });
 
@@ -1141,7 +1229,6 @@
         renderSidebar();
         renderContent();
         
-        // Actualizar la URL inicial si no hay parámetro en la URL
         if (getLessonFromURL() === null) {
             updateURL(currentLesson);
         }
