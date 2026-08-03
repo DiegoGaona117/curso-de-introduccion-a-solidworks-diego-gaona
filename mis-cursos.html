@@ -133,6 +133,41 @@
             100% { box-shadow: 0 0 0 0 #f9731600; }
         }
 
+        /* ── BOTÓN SESIÓN ── */
+        .btn-sesion {
+            height: 34px;
+            padding: 0 16px;
+            border-radius: 99px;
+            border: 1px solid var(--border2);
+            background: transparent;
+            color: var(--text);
+            font-family: 'Sora', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-sesion:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .btn-sesion.activa {
+            border-color: #10b98150;
+            color: var(--green);
+        }
+
+        .btn-sesion.activa:hover {
+            border-color: var(--green);
+            background: #10b98115;
+        }
+
         /* ── TOOLTIP DESCARGA ── */
         .tip-descarga {
             display: none;
@@ -550,6 +585,7 @@
             header { padding: 0 16px; min-height: 56px; }
             .logo { font-size: 14px; }
             .btn-acceso { font-size: 12px; padding: 0 12px; height: 32px; }
+            .btn-sesion { font-size: 11px; padding: 0 12px; height: 32px; }
 
             .hero { padding: 32px 16px 24px; }
             .hero p { font-size: 14px; }
@@ -575,6 +611,7 @@
 
         @media (max-width: 380px) {
             .btn-acceso span.btn-text-full { display: none; }
+            .btn-sesion span.btn-text-full { display: none; }
             .card-title { font-size: 15px; }
         }
 
@@ -599,6 +636,9 @@
 <header>
     <div class="logo">Diego <span>Gaona</span></div>
     <div style="display:flex; align-items:center; gap:10px;">
+        <button class="btn-sesion" id="btn-sesion" onclick="clicBotonSesion()">
+            <span id="btn-sesion-texto">Cargando…</span>
+        </button>
         <button class="btn-acceso" onclick="descargarAcceso()">⬇️ <span class="btn-text-full">Descarga tu acceso directo</span></button>
     </div>
 </header>
@@ -773,6 +813,58 @@
 </footer>
 
 <script>
+    /* ═══════════════ SESIÓN (dg_sesion) ═══════════════ */
+    const LOGIN_URL = "https://diegogaona117.github.io/login";
+    const SESION_KEY = "dg_sesion";
+
+    function leerSesion() {
+        const raw = localStorage.getItem(SESION_KEY);
+        if (!raw || raw === "Removido") return null;
+
+        try {
+            const datos = JSON.parse(raw);
+            if (!datos || datos.estado === "removido") return null;
+            if (datos.expira && Date.now() > Number(datos.expira)) return null;
+            return datos;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function actualizarBotonSesion() {
+        const sesion = leerSesion();
+        const btn = document.getElementById('btn-sesion');
+        const texto = document.getElementById('btn-sesion-texto');
+
+        if (sesion) {
+            btn.classList.add('activa');
+            texto.textContent = '🔓 Cerrar sesión';
+        } else {
+            btn.classList.remove('activa');
+            texto.textContent = '🔒 Iniciar sesión';
+        }
+    }
+
+    function clicBotonSesion() {
+        if (leerSesion()) {
+            cerrarSesion();
+        } else {
+            iniciarSesion();
+        }
+    }
+
+    function cerrarSesion() {
+        localStorage.setItem(SESION_KEY, "Removido");
+        window.location.href = LOGIN_URL;
+    }
+
+    function iniciarSesion() {
+        window.location.href = LOGIN_URL;
+    }
+
+    document.addEventListener('DOMContentLoaded', actualizarBotonSesion);
+
+    /* ═══════════════ DESCARGA ACCESO DIRECTO ═══════════════ */
 function descargarAcceso() {
     const html = `<!DOCTYPE html>
 <html lang="es">
