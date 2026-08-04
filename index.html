@@ -1418,6 +1418,7 @@ async function revalidarSesion() {
 
         if (!data.ok) {
             // La contraseña ya no coincide o el usuario ya no existe en el Sheet
+            // (incluye el caso estado === 'removido', que responde ok:false)
             if (sesion.estado !== 'removido') {
                 localStorage.setItem('dg_sesion', JSON.stringify({ ...sesion, estado: 'removido' }));
                 _lastEstado = 'removido';
@@ -1425,6 +1426,7 @@ async function revalidarSesion() {
                 renderSidebar();
                 updateProgress();
                 renderBotonComprar();
+                mostrarToastEstado('Tu acceso fue actualizado.', '⚠️');
             }
             return;
         }
@@ -1448,8 +1450,6 @@ async function revalidarSesion() {
 
             if (estadoNuevo === 'completo') {
                 mostrarToastEstado('¡Tu compra fue confirmada! Ya tienes acceso completo 🎓', '🎉');
-            } else if (estadoNuevo === 'removido') {
-                mostrarToastEstado('Tu acceso fue actualizado.', '⚠️');
             }
         }
     } catch (err) {
