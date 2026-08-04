@@ -1045,8 +1045,6 @@ const lessons = [
     { id:124, title:"Práctica 17: Convertir Entidades y Equidistanciar",      dur:"9:27",  section:"Práctica 17",                       type:"video", videoUrl:"https://drive.google.com/file/d/10z-lBOgFIECGzwXGgpLnz9oGsZhREcfB/preview?usp=drive_link",  pdfUrl:"https://drive.google.com/file/d/1B2iUZe3-9U9GpGA8zl2BYSfQ6dZJmgUj/view?usp=drive_link" },
     { id:125, title:"Plano para la siguiente clase: Florero",                 dur:"PDF",   section:"Práctica 17",                       type:"pdf",   videoUrl:null, pdfUrl:"https://drive.google.com/file/d/1clVbbAbJpHjP03nt6HHFR0v6kQkC-RHV/view?usp=drive_link" },
     { id:126, title:"Operación de vaciado: Florero",                          dur:"3:23",  section:"Práctica 17",                       type:"video", videoUrl:"https://drive.google.com/file/d/1KcQTtvm8qPo4C4vmavigW4Ty_h7sxrk9/preview?usp=drive_link",  pdfUrl:"https://drive.google.com/file/d/1B2iUZe3-9U9GpGA8zl2BYSfQ6dZJmgUj/view?usp=drive_link" },
-    { id:127, title:"Caja de transmisión parte 1",                            dur:"36:23",  section:"Práctica 17",                       type:"video", videoUrl:"https://drive.google.com/file/d/1mZGYHuMj_1OIZl9pnDpMhGMkAbCGncyt/preview?usp=drive_link",  pdfUrl:"https://drive.google.com/file/d/1_XfxhduG7MC3pR-frgbjBRQ-yPkjV7We/view?usp=drive_link" },
-    { id:127, title:"Caja de transmisión parte 2",                            dur:"32:23",  section:"Práctica 17",                       type:"video", videoUrl:"https://drive.google.com/file/d/14zSeR4ZZsP4oHhm_eq5xOdljze7Nkxfv/preview?usp=drive_link",  pdfUrl:"https://drive.google.com/file/d/1vmzYPNopFV3Xpi8aud0g0m_XP0y0XWgI/view?usp=drive_link" },
     // Conclusión
     { id:128, title:"¡Curso completado!", dur:"—", section:"Conclusión", type:"congrats" }
 ];
@@ -1384,7 +1382,7 @@ document.addEventListener('visibilitychange', () => {
 // hacer login, pero compra el curso. En Sheets su estado pasa a
 // "completo", pero su localStorage local se queda estancado en
 // "prueba" hasta que este chequeo lo actualiza.
-const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxEbbDW-MwWJQSorzOfWovtWb4YPGWaLp2XTMFgNPCuMI1qoTQZVgWh_W14qOJ8QoK3_g/exec';
+const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbygQ48ZOiIA6abGu0L9fwGLhLkPxapSQd0e2wXis07ZWjL263v42qEoCGEx7CXczirC/exec';
 const SESSION_DAYS = 30;
 
 function mostrarToastEstado(mensaje, icono = '🎉') {
@@ -1406,19 +1404,17 @@ async function revalidarSesion() {
         if (!raw) return;
 
         const sesion = JSON.parse(raw);
-        if (!sesion.email || !sesion.password) return; // sesión antigua sin credenciales
+        if (!sesion.email) return; // sesión antigua sin email guardado
 
         const url = WEBHOOK_URL
-            + '?action=login'
-            + '&email='    + encodeURIComponent(sesion.email)
-            + '&password=' + encodeURIComponent(sesion.password);
+            + '?action=checkEstado'
+            + '&email=' + encodeURIComponent(sesion.email);
 
         const res  = await fetch(url);
         const data = await res.json();
 
         if (!data.ok) {
-            // La contraseña ya no coincide o el usuario ya no existe en el Sheet
-            // (incluye el caso estado === 'removido', que responde ok:false)
+            // El correo ya no existe en el Sheet, o el estado es "removido"
             if (sesion.estado !== 'removido') {
                 localStorage.setItem('dg_sesion', JSON.stringify({ ...sesion, estado: 'removido' }));
                 _lastEstado = 'removido';
@@ -1426,7 +1422,6 @@ async function revalidarSesion() {
                 renderSidebar();
                 updateProgress();
                 renderBotonComprar();
-                mostrarToastEstado('Tu acceso fue actualizado.', '⚠️');
             }
             return;
         }
@@ -1450,6 +1445,8 @@ async function revalidarSesion() {
 
             if (estadoNuevo === 'completo') {
                 mostrarToastEstado('¡Tu compra fue confirmada! Ya tienes acceso completo 🎓', '🎉');
+            } else if (estadoNuevo === 'removido') {
+                mostrarToastEstado('Tu acceso fue actualizado.', '⚠️');
             }
         }
     } catch (err) {
