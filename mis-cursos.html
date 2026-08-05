@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="color-scheme" content="dark light">
 
     <!-- SEO -->
     <title>Mis Cursos — Diego Gaona | SolidWorks</title>
@@ -62,6 +63,27 @@
             --text:     #e8eaf0;
             --dim:      #9ca3af;
             --green:    #10b981;
+            --shadow:   rgba(0,0,0,0.5);
+            --surface-gold:   #14140f;
+            --surface-orange: #16110c;
+            color-scheme: dark;
+        }
+
+        /* ── TEMA CLARO — se activa solo si el sistema/navegador del usuario lo tiene así ── */
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg:       #f6f7f9;
+                --surface:  #ffffff;
+                --surface2: #eef1f5;
+                --border:   #00000014;
+                --border2:  #00000026;
+                --text:     #12151c;
+                --dim:      #5b6472;
+                --shadow:   rgba(0,0,0,0.12);
+                --surface-gold:   #fffaf0;
+                --surface-orange: #fff4ec;
+                color-scheme: light;
+            }
         }
 
         html { scroll-behavior: smooth; }
@@ -174,14 +196,14 @@
             position: fixed;
             top: 70px;
             right: 20px;
-            background: #1a1e2a;
+            background: var(--surface2);
             border: 1px solid #f9731640;
             border-radius: 12px;
             padding: 16px 20px;
             font-size: 13px;
-            color: #e8eaf0;
+            color: var(--text);
             z-index: 999;
-            box-shadow: 0 8px 32px #00000060;
+            box-shadow: 0 8px 32px var(--shadow);
             max-width: 280px;
             line-height: 1.6;
             animation: slideIn 0.25s ease;
@@ -194,7 +216,7 @@
 
         .tip-descarga p {
             margin-top: 8px;
-            color: #9ca3af;
+            color: var(--dim);
             font-size: 13px;
         }
 
@@ -259,6 +281,95 @@
             color: var(--dim);
             line-height: 1.7;
             max-width: 520px;
+        }
+
+        /* ── OFERTA HERO (solo visitantes sin sesión) ── */
+        .hero-oferta {
+            margin-top: 24px;
+            max-width: 560px;
+            background: var(--surface);
+            border: 1px solid #f9731635;
+            border-radius: 14px;
+            padding: 22px 24px;
+        }
+
+        .oferta-badge {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #fff;
+            background: var(--orange);
+            padding: 4px 10px;
+            border-radius: 99px;
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 14px;
+        }
+
+        .oferta-precio {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        .oferta-monto {
+            font-size: 30px;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            color: var(--text);
+        }
+
+        .oferta-nota {
+            font-size: 12.5px;
+            color: var(--dim);
+        }
+
+        .oferta-lista {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .oferta-lista li {
+            font-size: 13.5px;
+            color: var(--dim);
+            line-height: 1.5;
+            padding-left: 22px;
+            position: relative;
+        }
+
+        .oferta-lista li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--orange);
+            font-weight: 700;
+        }
+
+        .oferta-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            height: 42px;
+            padding: 0 22px;
+            border-radius: 10px;
+            background: var(--orange);
+            color: #fff;
+            font-family: 'Sora', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: background 0.15s, transform 0.15s;
+        }
+
+        .oferta-cta:hover {
+            background: #ea6a0a;
+            transform: translateY(-1px);
         }
 
         /* ── RUTA ── */
@@ -356,7 +467,7 @@
         .card:hover {
             transform: translateY(-4px);
             border-color: var(--border2);
-            box-shadow: 0 20px 40px #00000050;
+            box-shadow: 0 20px 40px var(--shadow);
         }
 
         .card-img {
@@ -387,7 +498,7 @@
             font-family: 'JetBrains Mono', monospace;
         }
 
-        .card-badge { box-shadow: 0 2px 8px #00000060; }
+        .card-badge { box-shadow: 0 2px 8px var(--shadow); }
 
         .badge-blue   { background: #3b82f6; color: #ffffff; border: 1px solid #ffffff30; }
         .badge-orange { background: #f97316; color: #ffffff; border: 1px solid #ffffff30; }
@@ -512,12 +623,12 @@
             display: grid;
             grid-template-columns: minmax(220px, 380px) 1fr;
             border: 1px solid #f9731635;
-            background: #16110c;
+            background: var(--surface-orange);
         }
 
         .card-meta:hover {
             border-color: #f9731660;
-            box-shadow: 0 20px 45px #00000060;
+            box-shadow: 0 20px 45px var(--shadow);
         }
 
         .card-meta .card-img-wrap {
@@ -550,12 +661,12 @@
             display: grid;
             grid-template-columns: minmax(220px, 380px) 1fr;
             border: 1px solid #eab30835;
-            background: #14140f;
+            background: var(--surface-gold);
         }
 
         .card-bonus:hover {
             border-color: #eab30860;
-            box-shadow: 0 20px 45px #00000060;
+            box-shadow: 0 20px 45px var(--shadow);
         }
 
         .card-bonus .card-img-wrap {
@@ -630,6 +741,8 @@
 
             .hero { padding: 32px 16px 24px; }
             .hero p { font-size: 14px; }
+            .hero-oferta { padding: 18px 16px; margin-top: 20px; }
+            .oferta-monto { font-size: 26px; }
 
             .ruta { padding: 0 16px; font-size: 11px; }
 
@@ -703,7 +816,37 @@
     <div class="hero-label">Ruta de aprendizaje</div>
     <h1>Aprende SolidWorks con <span>Diego Gaona</span></h1>
     <p>Módulos diseñados paso a paso para llevarte de cero hasta la certificación CSWA.</p>
+
+    <div class="hero-oferta" id="hero-oferta">
+        <span class="oferta-badge">Acceso completo</span>
+        <div class="oferta-precio">
+            <span class="oferta-monto">$999 MXN</span>
+            <span class="oferta-nota">pago único · acceso de por vida</span>
+        </div>
+        <ul class="oferta-lista">
+            <li>Los 4 módulos completos: Pieza, Planos, Ensambles y Simulador de práctica para el examen CSWA</li>
+            <li>Bonus: paquete de +200 planos PDF para practicar</li>
+            <li>Acompañamiento por WhatsApp incluido en tu pago único, desde que empiezas hasta que terminas el curso</li>
+        </ul>
+        <a class="oferta-cta" href="https://wa.me/+5214621579719?text=Hola%20Diego%2C%20quiero%20obtener%20el%20acceso%20completo%20a%20los%20cursos%20por%20%24999" target="_blank" rel="noopener">
+            💬 Quiero mi acceso →
+        </a>
+    </div>
 </div>
+
+<script>
+    // Oculta la oferta ANTES del primer render si ya hay sesión activa (evita parpadeo)
+    (function () {
+        try {
+            const raw = localStorage.getItem('dg_sesion');
+            if (!raw || raw === 'Removido') return;
+            const datos = JSON.parse(raw);
+            if (!datos || datos.estado === 'removido') return;
+            if (datos.expira && Date.now() > Number(datos.expira)) return;
+            document.write('<style>#hero-oferta{display:none}</style>');
+        } catch (e) { /* si falla, se deja visible y el JS de abajo decide */ }
+    })();
+</script>
 
 <!-- RUTA -->
 <div class="ruta">
@@ -728,15 +871,11 @@
         <div class="card-body">
             <div class="card-num">MÓDULO 1</div>
             <div class="card-title">Domina el Modelado 3D desde Cero</div>
-            <div class="card-desc">Aprende a diseñar cualquier componente mecánico. Metodología paso a paso con videos explicativos, ejercicios prácticos y planos técnicos reales.</div>
+            <div class="card-desc">Empiezas aquí, desde cero. Sé que la pantalla de SolidWorks puede intimidar al inicio — le pasa a casi todos mis alumnos. Por eso vamos paso a paso, con ejercicios reales y planos técnicos, hasta que diseñar una pieza deje de sentirse complicado.</div>
             <div class="card-features">
                 <span class="feat">+170 lecciones</span>
                 <span class="feat">17 prácticas</span>
                 <span class="feat">Planos PDF</span>
-            </div>
-            <div class="author">
-                <div class="author-avatar">DG</div>
-                <span class="author-name">Diego Armando Gaona Ramírez</span>
             </div>
         </div>
         <div class="card-footer">
@@ -753,15 +892,11 @@
         <div class="card-body">
             <div class="card-num">MÓDULO 2</div>
             <div class="card-title">Crea Planos Técnicos Profesionales</div>
-            <div class="card-desc">Saber modelar en 3D es solo la mitad del trabajo. Aprende a crear la documentación técnica y los planos que se usan en la industria real.</div>
+            <div class="card-desc">Esta parte suele sentirse más técnica, y está bien si al principio no le encuentras el chiste. Pero es justo lo que separa a alguien que "sabe modelar" de alguien que puede entregar un trabajo real. Aquí aprendes a comunicar tus diseños como se hace en la industria.</div>
             <div class="card-features">
                 <span class="feat">26 lecciones</span>
                 <span class="feat">Plantillas 2D</span>
                 <span class="feat">Exportar PDF</span>
-            </div>
-            <div class="author">
-                <div class="author-avatar">DG</div>
-                <span class="author-name">Diego Armando Gaona Ramírez</span>
             </div>
         </div>
         <div class="card-footer">
@@ -778,15 +913,11 @@
         <div class="card-body">
             <div class="card-num">MÓDULO 3</div>
             <div class="card-title">Experto en Ensambles y Mecanismos</div>
-            <div class="card-desc">Lleva tus diseños al siguiente nivel. Aprende a unir componentes, simular movimiento y dominar las relaciones de posición avanzadas.</div>
+            <div class="card-desc">Ya no trabajas una pieza sola — ahora las haces funcionar juntas. Esta etapa es donde más alumnos se traban, porque hay más piezas moviéndose a la vez. Vamos a resolverlo con calma: uniones, movimiento real, mecanismos completos.</div>
             <div class="card-features">
                 <span class="feat">41 lecciones</span>
                 <span class="feat">Animaciones</span>
                 <span class="feat">Mecanismos</span>
-            </div>
-            <div class="author">
-                <div class="author-avatar">DG</div>
-                <span class="author-name">Diego Armando Gaona Ramírez</span>
             </div>
         </div>
         <div class="card-footer">
@@ -806,15 +937,11 @@
         <div class="card-body">
             <div class="card-num">MÓDULO 4 · META FINAL</div>
             <div class="card-title">Simulador del Examen CSWA</div>
-            <div class="card-desc">No arriesgues tu dinero. Practica con nuestro simulador idéntico al examen oficial y asegura tu certificación desde el primer intento.</div>
+            <div class="card-desc">Llegaste hasta aquí — ahora toca comprobar que puedes con el examen real. Sé lo que se siente pagar la certificación y no saber si vas a pasar. Por eso practicamos en condiciones idénticas a las del examen oficial, para que llegues con la confianza de ya haberlo hecho antes.</div>
             <div class="card-features">
                 <span class="feat">3 exámenes</span>
                 <span class="feat">36 preguntas</span>
                 <span class="feat">Condición real</span>
-            </div>
-            <div class="author">
-                <div class="author-avatar">DG</div>
-                <span class="author-name">Diego Armando Gaona Ramírez</span>
             </div>
         </div>
         <div class="card-footer">
@@ -836,15 +963,11 @@
         <div class="card-body">
             <div class="card-num">BONUS</div>
             <div class="card-title">Paquete de +200 Planos PDF para Practicar</div>
-            <div class="card-desc">Lleva la teoría a la práctica real. Un paquete con aproximadamente 200 planos en PDF, organizados desde piezas de nivel cero hasta ejercicios de nivel intermedio-avanzado y ensambles completos, para que ejercites cada módulo con casos reales.</div>
+            <div class="card-desc">Después de cada módulo, la práctica es lo que realmente fija el aprendizaje. Te dejo más de 200 planos en PDF, desde nivel cero hasta ensambles avanzados, para que sigas ejercitando por tu cuenta lo que ya aprendiste conmigo.</div>
             <div class="card-features">
                 <span class="feat">+200 planos PDF</span>
                 <span class="feat">Nivel cero → avanzado</span>
                 <span class="feat">Incluye ensambles</span>
-            </div>
-            <div class="author">
-                <div class="author-avatar">DG</div>
-                <span class="author-name">Diego Armando Gaona Ramírez</span>
             </div>
         </div>
         <div class="card-footer">
@@ -881,13 +1004,16 @@
         const sesion = leerSesion();
         const btn = document.getElementById('btn-sesion');
         const texto = document.getElementById('btn-sesion-texto');
+        const oferta = document.getElementById('hero-oferta');
 
         if (sesion) {
             btn.classList.add('activa');
             texto.textContent = '🔓 Cerrar sesión';
+            if (oferta) oferta.style.display = 'none';
         } else {
             btn.classList.remove('activa');
             texto.textContent = '🔒 Iniciar sesión';
+            if (oferta) oferta.style.display = 'block';
         }
     }
 
