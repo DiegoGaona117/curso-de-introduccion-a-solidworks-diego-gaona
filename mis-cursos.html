@@ -506,6 +506,44 @@
             font-family: 'JetBrains Mono', monospace;
         }
 
+        /* ── CARD META (Paso 4, destacada, ocupa todo el ancho) ── */
+        .card-meta {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: minmax(220px, 380px) 1fr;
+            border: 1px solid #f9731635;
+            background: #16110c;
+        }
+
+        .card-meta:hover {
+            border-color: #f9731660;
+            box-shadow: 0 20px 45px #00000060;
+        }
+
+        .card-meta .card-img-wrap {
+            aspect-ratio: auto;
+            height: 100%;
+        }
+
+        .card-meta .card-img {
+            height: 100%;
+            aspect-ratio: auto;
+            object-fit: cover;
+        }
+
+        .card-meta .card-body {
+            padding: 24px 28px;
+            justify-content: center;
+        }
+
+        .card-meta .card-title {
+            font-size: 20px;
+        }
+
+        .card-meta .card-footer {
+            padding: 18px 28px;
+        }
+
         /* ── BONUS CARD (destacada, ocupa todo el ancho) ── */
         .card-bonus {
             grid-column: 1 / -1;
@@ -574,11 +612,14 @@
         /* ══════════════════ MOBILE — 100% ADAPTADO ══════════════════ */
         @media (max-width: 720px) {
             .grid { grid-template-columns: 1fr; }
-            .card-bonus {
+            .card-bonus,
+            .card-meta {
                 grid-template-columns: 1fr;
             }
-            .card-bonus .card-img-wrap { aspect-ratio: 16/9; height: auto; }
-            .card-bonus .card-img { aspect-ratio: 16/9; height: auto; }
+            .card-bonus .card-img-wrap,
+            .card-meta .card-img-wrap { aspect-ratio: 16/9; height: auto; }
+            .card-bonus .card-img,
+            .card-meta .card-img { aspect-ratio: 16/9; height: auto; }
         }
 
         @media (max-width: 600px) {
@@ -602,9 +643,12 @@
             .card-desc { font-size: 12.5px; }
             .card-footer { padding: 12px 16px; }
 
-            .card-bonus .card-body { padding: 18px 16px; }
-            .card-bonus .card-title { font-size: 18px; }
-            .card-bonus .card-footer { padding: 14px 16px; }
+            .card-bonus .card-body,
+            .card-meta .card-body { padding: 18px 16px; }
+            .card-bonus .card-title,
+            .card-meta .card-title { font-size: 18px; }
+            .card-bonus .card-footer,
+            .card-meta .card-footer { padding: 14px 16px; }
 
             .tip-descarga { right: 10px; left: 10px; max-width: none; top: 64px; }
         }
@@ -704,7 +748,7 @@
     <a class="card" href="https://diegogaona117.github.io/curso-de-solidworks-modulo-pieza-diego-gaona/planos-2d.html">
         <div class="card-img-wrap">
             <img class="card-img" src="https://static.wixstatic.com/media/32c95b_92c7dfcd06e24252a36ebedadd500c59~mv2.webp" alt="Planos 2D" loading="lazy">
-            <span class="card-badge badge-orange">Paso 2</span>
+            <span class="card-badge badge-blue">Paso 2</span>
         </div>
         <div class="card-body">
             <div class="card-num">MÓDULO 2</div>
@@ -721,7 +765,7 @@
             </div>
         </div>
         <div class="card-footer">
-            <button class="btn-card btn-orange">Entrar →</button>
+            <button class="btn-card btn-primary">Entrar →</button>
         </div>
     </a>
 
@@ -729,7 +773,7 @@
     <a class="card" href="https://diegogaona117.github.io/curso-de-solidworks-modulo-pieza-diego-gaona/modulo-ensamble.html">
         <div class="card-img-wrap">
             <img class="card-img" src="https://static.wixstatic.com/media/32c95b_4e6ff876f8584bee9580e94f17aafb01~mv2.webp" alt="Ensamble" loading="lazy">
-            <span class="card-badge badge-green">Paso 3</span>
+            <span class="card-badge badge-blue">Paso 3</span>
         </div>
         <div class="card-body">
             <div class="card-num">MÓDULO 3</div>
@@ -746,18 +790,21 @@
             </div>
         </div>
         <div class="card-footer">
-            <button class="btn-card btn-green">Entrar →</button>
+            <button class="btn-card btn-primary">Entrar →</button>
         </div>
     </a>
 
-    <!-- CARD 4 -->
-    <a class="card" href="https://diegogaona117.github.io/curso-de-solidworks-modulo-pieza-diego-gaona/simuladores-cswa.html">
+</div>
+
+<!-- CARD 4 — destacada, meta final del camino -->
+<div class="grid" style="padding-top:0;">
+    <a class="card card-meta" href="https://diegogaona117.github.io/curso-de-solidworks-modulo-pieza-diego-gaona/simuladores-cswa.html">
         <div class="card-img-wrap">
             <img class="card-img" src="https://static.wixstatic.com/media/32c95b_8912d1c812b54b9798b69fe6ac7bf1ae~mv2.webp" alt="Simulador CSWA" loading="lazy">
-            <span class="card-badge badge-purple">Paso 4</span>
+            <span class="card-badge badge-orange">Paso 4</span>
         </div>
         <div class="card-body">
-            <div class="card-num">MÓDULO 4</div>
+            <div class="card-num">MÓDULO 4 · META FINAL</div>
             <div class="card-title">Simulador del Examen CSWA</div>
             <div class="card-desc">No arriesgues tu dinero. Practica con nuestro simulador idéntico al examen oficial y asegura tu certificación desde el primer intento.</div>
             <div class="card-features">
@@ -771,10 +818,9 @@
             </div>
         </div>
         <div class="card-footer">
-            <button class="btn-card btn-purple">Entrar →</button>
+            <button class="btn-card btn-orange">Entrar →</button>
         </div>
     </a>
-
 </div>
 
 <!-- SECCIÓN BONUS -->
