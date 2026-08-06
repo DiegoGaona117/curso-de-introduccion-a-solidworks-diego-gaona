@@ -856,19 +856,20 @@ function isLessonFree(lesson) {
    real del video, y "dur" por la duración real (mm:ss).
    ═══════════════════════════════════════════════════════ */
 const lessons = [
-    { id:301, title:"Brazo robótico — Parte 1",  dur:"—", section:"Diseño de Brazo Robótico", type:"video", videoUrl:"https://youtu.be/glgOxxlPqO4", pdfUrl:null },
-    { id:302, title:"Brazo robótico — Parte 2",  dur:"—", section:"Diseño de Brazo Robótico", type:"video", videoUrl:"https://youtu.be/Z5gBLVI_ujU", pdfUrl:null },
-    { id:303, title:"Brazo robótico — Parte 3",  dur:"—", section:"Diseño de Brazo Robótico", type:"video", videoUrl:"https://youtu.be/qrwbwEoloXs", pdfUrl:null },
-    { id:304, title:"Brazo robótico — Parte 4",  dur:"—", section:"Diseño de Brazo Robótico", type:"video", videoUrl:"https://youtu.be/h_gPtSYNtDY", pdfUrl:null },
-    { id:305, title:"Brazo robótico — Parte 5",  dur:"—", section:"Diseño de Brazo Robótico", type:"video", videoUrl:"https://youtu.be/uD4bSeBg_IE", pdfUrl:null },
-    { id:306, title:"Brazo robótico — Parte 6",  dur:"—", section:"Diseño de Brazo Robótico", type:"video", videoUrl:"https://youtu.be/RrZIAsmkX8c", pdfUrl:null },
-    { id:307, title:"Brazo robótico — Parte 7",  dur:"—", section:"Diseño de Brazo Robótico", type:"video", videoUrl:"https://youtu.be/fi82i-CglrU", pdfUrl:null },
-    { id:308, title:"Brazo robótico — Parte 8",  dur:"—", section:"Diseño de Brazo Robótico", type:"video", videoUrl:"https://youtu.be/_w6T88hlxlc", pdfUrl:null },
-    { id:309, title:"Brazo robótico — Parte 9",  dur:"—", section:"Diseño de Brazo Robótico", type:"video", videoUrl:"https://youtu.be/6h-0nHddNmM", pdfUrl:null },
-    { id:310, title:"Brazo robótico — Parte 10", dur:"—", section:"Diseño de Brazo Robótico", type:"video", videoUrl:"https://youtu.be/ERGqtd4ZL3k", pdfUrl:null },
-    { id:311, title:"Brazo robótico — Parte 11", dur:"—", section:"Diseño de Brazo Robótico", type:"video", videoUrl:"https://youtu.be/0lz4t_NSYLU", pdfUrl:null },
-    { id:312, title:"Brazo robótico — Parte 12", dur:"—", section:"Diseño de Brazo Robótico", type:"video", videoUrl:"https://youtu.be/u5XVJX8oPQ0", pdfUrl:null },
-    { id:313, title:"Brazo robótico — Parte 13", dur:"—", section:"Diseño de Brazo Robótico", type:"video", videoUrl:"https://youtu.be/J1VxhNDxf8U", pdfUrl:null },
+    { id:301, title:"Brazo robótico — Pieza 1",  dur:"—", section:"Diseño de Brazo Robótico", type:"video", videoUrl:"https://youtu.be/glgOxxlPqO4", pdfUrl:null },
+    { id:302, title:"Brazo robótico — Pieza 2",  dur:"—", section:"Diseño de Brazo Robótico", type:"video", videoUrl:"https://youtu.be/Z5gBLVI_ujU", pdfUrl:null },
+    { id:303, title:"Brazo robótico — Pieza 3",  dur:"—", section:"Diseño de Brazo Robótico", type:"video", videoUrl:"https://youtu.be/qrwbwEoloXs", pdfUrl:null },
+    { id:304, title:"Brazo robótico — Pieza 4",  dur:"—", section:"Diseño de Brazo Robótico", type:"video", videoUrl:"https://youtu.be/h_gPtSYNtDY", pdfUrl:null },
+    { id:305, title:"Brazo robótico — Pieza 5",  dur:"—", section:"Diseño de Brazo Robótico", type:"video", videoUrl:"https://youtu.be/uD4bSeBg_IE", pdfUrl:null },
+    { id:306, title:"Brazo robótico — Pieza 6",  dur:"—", section:"Diseño de Brazo Robótico", type:"video", videoUrl:"https://youtu.be/RrZIAsmkX8c", pdfUrl:null },
+    { id:307, title:"Brazo robótico — Pieza 7",  dur:"—", section:"Diseño de Brazo Robótico", type:"video", videoUrl:"https://youtu.be/fi82i-CglrU", pdfUrl:null },
+    { id:308, title:"Brazo robótico — Pieza 8",  dur:"—", section:"Diseño de Brazo Robótico", type:"video", videoUrl:"https://youtu.be/_w6T88hlxlc", pdfUrl:null },
+    { id:309, title:"Brazo robótico — Servomotor sg90", dur:"—", section:"Diseño de Brazo Robótico", type:"video", videoUrl:"https://youtu.be/0lz4t_NSYLU", pdfUrl:null },
+    { id:310, title:"Brazo robótico — Eje servomotor sg90", dur:"—", section:"Diseño de Brazo Robótico", type:"video", videoUrl:"https://youtu.be/ERGqtd4ZL3k", pdfUrl:null },
+    { id:311, title:"Brazo robótico — Servomotor mg995",  dur:"—", section:"Diseño de Brazo Robótico", type:"video", videoUrl:"https://youtu.be/QvKs8Di-hlU", pdfUrl:null },
+    { id:312, title:"Brazo robótico — Eje servomotor mg995", dur:"—", section:"Diseño de Brazo Robótico", type:"video", videoUrl:"https://youtu.be/6h-0nHddNmM", pdfUrl:null },
+    { id:313, title:"Brazo robótico — Gear Arm 1", dur:"—", section:"Diseño de Brazo Robótico", type:"video", videoUrl:"https://youtu.be/u5XVJX8oPQ0", pdfUrl:null },
+    { id:314, title:"Brazo robótico — Gear Arm 2", dur:"—", section:"Diseño de Brazo Robótico", type:"video", videoUrl:"https://youtu.be/J1VxhNDxf8U", pdfUrl:null },
     { id:128, title:"¡Proyecto completado!", dur:"—", section:"Conclusión", type:"congrats" }
 ];
 
