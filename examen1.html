@@ -393,6 +393,25 @@
 
 
 <script>
+
+  document.addEventListener("DOMContentLoaded", function() {
+  var urlParams = new URLSearchParams(window.location.search);
+  var orderCode = urlParams.get('orderCode');
+
+  if (orderCode) {
+    var SCRIPT_URL = 'TU_URL_DE_APPS_SCRIPT_AQUI';
+
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        orderCode: orderCode,
+        destino: 'examen1' // 👈 Aquí le indicas que marque la columna H (Examen1)
+      })
+    });
+  }
+});
   /* =============================================
      PREGUNTAS
   ============================================= */
