@@ -1089,35 +1089,32 @@
     //  mismo aunque el localStorage local siga "vigente".
     // ─────────────────────────────────────────────────────────
     async function revalidarSesionServidor() {
-        const sesion = leerSesion();
-        if (!sesion || !sesion.email || !sesion.codigo) return; // sin sesión o sesión vieja sin código: no hay nada que validar aquí
+    const sesion = leerSesion();
+    if (!sesion || !sesion.email) return; // no hay sesión, nada que validar
 
-        try {
-            const url = WEBHOOK_URL
-                + '?action=checkEstado'
-                + '&email='  + encodeURIComponent(sesion.email)
-                + '&codigo=' + encodeURIComponent(sesion.codigo);
-
-            const res  = await fetch(url);
-            const data = await res.json();
-            const estado = (data.estado || '').toString().trim().toLowerCase();
-
-            const sigueValida = data.ok
-                && data.sesionValida
-                && estado !== 'removido';
-
-            if (!sigueValida) {
-                // Alguien más tomó la sesión (o el acceso ya no es válido):
-                // se cierra localmente y se manda al login.
-                cerrarSesion();
-            }
-        } catch (e) {
-            // Sin conexión: no se cierra sesión por un error de red,
-            // se reintenta en el siguiente ciclo.
-            console.error('No se pudo revalidar la sesión:', e);
-        }
+    if (!sesion.codigo) {
+        // Sesión de antes del sistema de código de seguridad:
+        // ya no es válida por definición, se cierra.
+        cerrarSesion();
+        return;
     }
 
+    try {
+        const url = WEBHOOK_URL
+            + '?action=checkEstado'
+            + '&email='  + encodeURIComponent(sesion.email)
+            + '&codigo=' + encodeURIComponent(sesion.codigo);
+
+        const res  = await fetch(url);
+        const data = await res.json();
+        const estado = (data.estado || '').toString().trim().toLowerCase();
+
+        const sigueValida = data.ok && data.sesionValida && estado !== 'removido';
+        if (!sigueValida) cerrarSesion();
+    } catch (e) {
+        console.error('No se pudo revalidar la sesión:', e);
+    }
+}
     document.addEventListener('DOMContentLoaded', () => {
         actualizarBotonSesion();
         revalidarSesionServidor();                          // al cargar la página
