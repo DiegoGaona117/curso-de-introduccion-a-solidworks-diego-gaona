@@ -1294,47 +1294,60 @@ async function revalidarSesion() {
         const sesion = JSON.parse(raw);
         if (!sesion.email) return; // sesión antigua sin email guardado
 
+        // Sesión guardada antes del sistema de código de seguridad:
+        // ya no es válida por definición, se cierra directo.
+        if (!sesion.codigo) {
+            cerrarSesionForzada('Tu sesión ya no es válida. Inicia sesión de nuevo.');
+            return;
+        }
+
         const url = WEBHOOK_URL
             + '?action=checkEstado'
-            + '&email=' + encodeURIComponent(sesion.email);
+            + '&email='  + encodeURIComponent(sesion.email)
+            + '&codigo=' + encodeURIComponent(sesion.codigo);
 
         const res  = await fetch(url);
         const data = await res.json();
 
         if (!data.ok) {
-            // El correo ya no existe en el Sheet, o el estado es "removido"
-            if (sesion.estado !== 'removido') {
-                localStorage.setItem('dg_sesion', JSON.stringify({ ...sesion, estado: 'removido' }));
-                _lastEstado = 'removido';
-                renderContent();
-                renderSidebar();
-                updateProgress();
-                renderBotonComprar();
-            }
+            // El correo ya no existe en el Sheet
+            cerrarSesionForzada('Tu acceso ya no está disponible.');
             return;
         }
 
-        const estadoAnterior = sesion.estado;
-        const estadoNuevo    = (data.estado || '').toString().trim().toLowerCase();
+        const estado = (data.estado || '').toString().trim().toLowerCase();
 
-        if (estadoNuevo && estadoNuevo !== estadoAnterior) {
+        if (!data.sesionValida || estado === 'removido') {
+            // El código ya no coincide (alguien más inició sesión con
+            // este correo desde entonces) o el acceso fue removido.
+            cerrarSesionForzada(
+                !data.sesionValida
+                    ? 'Tu sesión se abrió en otro dispositivo. Inicia sesión de nuevo.'
+                    : 'Tu acceso fue removido.'
+            );
+            return;
+        }
+
+        // Sesión sigue siendo la activa: solo actualizamos el estado
+        // si cambió (ej. "prueba" -> "completo" tras una compra).
+        const estadoAnterior = sesion.estado;
+
+        if (estado && estado !== estadoAnterior) {
             const nuevaSesion = {
                 ...sesion,
-                estado: estadoNuevo,
-                expira: Date.now() + SESSION_DAYS * 24 * 60 * 60 * 1000 // renueva ventana de sesión
+                estado: estado,
+                expira: Date.now() + SESSION_DAYS * 24 * 60 * 60 * 1000
             };
             localStorage.setItem('dg_sesion', JSON.stringify(nuevaSesion));
-            _lastEstado = estadoNuevo;
+            _lastEstado = estado;
 
             renderContent();
             renderSidebar();
             updateProgress();
             renderBotonComprar();
 
-            if (estadoNuevo === 'completo') {
+            if (estado === 'completo') {
                 mostrarToastEstado('¡Tu compra fue confirmada! Ya tienes acceso completo 🎓', '🎉');
-            } else if (estadoNuevo === 'removido') {
-                mostrarToastEstado('Tu acceso fue actualizado.', '⚠️');
             }
         }
     } catch (err) {
@@ -1343,7 +1356,6 @@ async function revalidarSesion() {
         _revalidando = false;
     }
 }
-
 // Revalidar al cargar la página
 revalidarSesion();
 
