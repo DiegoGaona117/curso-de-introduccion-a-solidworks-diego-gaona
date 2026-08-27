@@ -1029,8 +1029,10 @@
 
 <script>
     /* ═══════════════ SESIÓN (dg_sesion) ═══════════════ */
-    const LOGIN_URL = "https://diegogaona117.github.io/login";
-    const SESION_KEY = "dg_sesion";
+    const LOGIN_URL   = "https://diegogaona117.github.io/login";
+    const SESION_KEY  = "dg_sesion";
+    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxEbbDW-MwWJQSorzOfWovtWb4YPGWaLp2XTMFgNPCuMI1qoTQZVgWh_W14qOJ8QoK3_g/exec";
+    const REVALIDAR_CADA_MS = 5 * 60 * 1000; // cada 5 minutos
 
     function leerSesion() {
         const raw = localStorage.getItem(SESION_KEY);
@@ -1080,7 +1082,47 @@
         window.location.href = LOGIN_URL;
     }
 
-    document.addEventListener('DOMContentLoaded', actualizarBotonSesion);
+    // ─────────────────────────────────────────────────────────
+    //  Revalida contra el servidor que el "codigo" de esta sesión
+    //  sigue siendo el activo (nadie más inició sesión con este
+    //  correo después). Si ya no coincide, cierra sesión aquí
+    //  mismo aunque el localStorage local siga "vigente".
+    // ─────────────────────────────────────────────────────────
+    async function revalidarSesionServidor() {
+        const sesion = leerSesion();
+        if (!sesion || !sesion.email || !sesion.codigo) return; // sin sesión o sesión vieja sin código: no hay nada que validar aquí
+
+        try {
+            const url = WEBHOOK_URL
+                + '?action=checkEstado'
+                + '&email='  + encodeURIComponent(sesion.email)
+                + '&codigo=' + encodeURIComponent(sesion.codigo);
+
+            const res  = await fetch(url);
+            const data = await res.json();
+            const estado = (data.estado || '').toString().trim().toLowerCase();
+
+            const sigueValida = data.ok
+                && data.sesionValida
+                && estado !== 'removido';
+
+            if (!sigueValida) {
+                // Alguien más tomó la sesión (o el acceso ya no es válido):
+                // se cierra localmente y se manda al login.
+                cerrarSesion();
+            }
+        } catch (e) {
+            // Sin conexión: no se cierra sesión por un error de red,
+            // se reintenta en el siguiente ciclo.
+            console.error('No se pudo revalidar la sesión:', e);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        actualizarBotonSesion();
+        revalidarSesionServidor();                          // al cargar la página
+        setInterval(revalidarSesionServidor, REVALIDAR_CADA_MS); // y cada 5 minutos mientras esté abierta
+    });
 
     /* ═══════════════ DESCARGA ACCESO DIRECTO ═══════════════ */
 function descargarAcceso() {
