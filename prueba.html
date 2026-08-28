@@ -231,17 +231,27 @@
 
   // --- Cargar el video como blob para que el src visible no sea la URL real ---
   async function cargarVideo() {
-    try {
-      const respuesta = await fetch(VIDEO_URL);
-      const blob = await respuesta.blob();
-      blobUrl = URL.createObjectURL(blob);
-      video.src = blobUrl;
-      loadingMsg.style.display = 'none';
-    } catch (err) {
-      loadingMsg.textContent = 'No se pudo cargar el video.';
-      console.error(err);
+  try {
+    const sessionToken = localStorage.getItem('dg_sesion'); // tu sistema de sesión ya existente
+    const videoId = "leccion-05"; // idealmente lo pasas por atributo data- en el HTML de cada lección
+
+    const tokenResp = await fetch(`${VIDEO_URL}/get-video-url?session=${encodeURIComponent(sessionToken)}&video=${encodeURIComponent(videoId)}`);
+    if (!tokenResp.ok) {
+      loadingMsg.textContent = 'Sesión no válida. Inicia sesión de nuevo.';
+      return;
     }
+    const { url: signedUrl } = await tokenResp.json();
+
+    const respuesta = await fetch(signedUrl);
+    const blob = await respuesta.blob();
+    blobUrl = URL.createObjectURL(blob);
+    video.src = blobUrl;
+    loadingMsg.style.display = 'none';
+  } catch (err) {
+    loadingMsg.textContent = 'No se pudo cargar el video.';
+    console.error(err);
   }
+}
   cargarVideo();
 
   // Liberar memoria del blob al salir de la página
