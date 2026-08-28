@@ -1296,6 +1296,19 @@ document.addEventListener('visibilitychange', () => {
 const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxEbbDW-MwWJQSorzOfWovtWb4YPGWaLp2XTMFgNPCuMI1qoTQZVgWh_W14qOJ8QoK3_g/exec';
 const SESSION_DAYS = 30;
 
+    // ── Cierra la sesión de forma forzada (código inválido, sesión
+// vieja sin código, o acceso removido) y refresca la UI para
+// que el contenido bloqueado muestre el paywall correspondiente. ──
+function cerrarSesionForzada(mensaje) {
+    localStorage.removeItem('dg_sesion');
+    _lastEstado = null;
+    mostrarToastEstado(mensaje, '⚠️');
+    renderContent();
+    renderSidebar();
+    updateProgress();
+    renderBotonComprar();
+}
+
 function mostrarToastEstado(mensaje, icono = '🎉') {
     const toast = document.getElementById('statusToast');
     if (!toast) return;
