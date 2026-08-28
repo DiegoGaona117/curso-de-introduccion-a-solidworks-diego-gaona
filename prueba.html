@@ -32,7 +32,6 @@
     box-shadow: 0 10px 40px rgba(0,0,0,0.5);
   }
 
-  /* --- Pantalla completa: el wrapper ocupa toda la pantalla --- */
   .player-wrapper:fullscreen,
   .player-wrapper:-webkit-full-screen {
     max-width: 100%;
@@ -64,11 +63,9 @@
     width: 100%;
     display: block;
     max-height: 80vh;
-    /* Capa invisible encima evita drag & drop directo del <video> */
     pointer-events: none;
   }
 
-  /* Capa transparente que captura los clics reales (evita "Guardar video como") */
   .click-shield {
     position: absolute;
     top: 0;
@@ -89,7 +86,6 @@
     z-index: 1;
   }
 
-  /* --- Controles ahora flotan SOBRE el video --- */
   .controls {
     position: absolute;
     left: 0;
@@ -108,14 +104,12 @@
     pointer-events: auto;
   }
 
-  /* Estado oculto: se agrega/quita con JS tras 2s de inactividad */
   .controls.hidden {
     opacity: 0;
     transform: translateY(10px);
     pointer-events: none;
   }
 
-  /* Mientras los controles están ocultos, mostrar cursor normal en vez de "mano" */
   .video-container.controls-hidden {
     cursor: none;
   }
@@ -209,10 +203,10 @@
 </div>
 
 <script>
-  // ============ URL DE TU WORKER (proxy protegido, no R2 directo) ============
-  const VIDEO_URL = "https://red-hat-d80e.cursodiegogaona.workers.dev";
- const NOMBRE_DEL_VIDEO = "Activar enganche";
-  // ==============================================================================
+  // ============ CONFIGURACIÓN DEL WORKER ============
+  const WORKER_BASE_URL = "https://red-hat-d80e.cursodiegogaona.workers.dev";
+  const NOMBRE_DEL_VIDEO = "Activar enganche"; // El nombre de tu video en R2, sin el .mp4
+  // ====================================================
 
   const playerWrapper = document.getElementById('playerWrapper');
   const video = document.getElementById('miVideo');
@@ -228,27 +222,29 @@
   const volumeIcon = document.getElementById('volumeIcon');
   const fullscreenBtn = document.getElementById('fullscreenBtn');
 
-  let blobUrl = null;
-
-  // --- Cargar el video como blob para que el src visible no sea la URL real ---
+  // --- Cargar la URL segura y asignarla al video ---
   async function cargarVideo() {
     try {
-      const respuesta = await fetch(VIDEO_URL);
-      const blob = await respuesta.blob();
-      blobUrl = URL.createObjectURL(blob);
-      video.src = blobUrl;
+      const peticionUrl = `${WORKER_BASE_URL}/get-video-url?video=${encodeURIComponent(NOMBRE_DEL_VIDEO)}`;
+      const respuesta = await fetch(peticionUrl);
+      
+      if (!respuesta.ok) {
+        throw new Error(`Error del servidor: ${respuesta.status}`);
+      }
+
+      const datos = await respuesta.json();
+
+      // Asignar directamente la URL al src del video
+      video.src = datos.url;
       loadingMsg.style.display = 'none';
+      
     } catch (err) {
       loadingMsg.textContent = 'No se pudo cargar el video.';
-      console.error(err);
+      console.error("Error al cargar el video:", err);
     }
   }
+  
   cargarVideo();
-
-  // Liberar memoria del blob al salir de la página
-  window.addEventListener('beforeunload', () => {
-    if (blobUrl) URL.revokeObjectURL(blobUrl);
-  });
 
   // --- Formatear tiempo ---
   function formatTime(seconds) {
@@ -283,7 +279,7 @@
 
   video.addEventListener('ended', () => {
     playPauseBtn.textContent = '▶';
-    mostrarControles(); // al terminar, dejamos los controles visibles
+    mostrarControles(); 
   });
 
   progressContainer.addEventListener('click', (e) => {
@@ -298,7 +294,7 @@
     volumeIcon.textContent = video.volume == 0 ? '🔇' : (video.volume < 0.5 ? '🔉' : '🔊');
   });
 
-  // --- Pantalla completa: alterna entre entrar y salir (toggle) ---
+  // --- Pantalla completa ---
   function estaEnFullscreen() {
     return !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
   }
@@ -331,8 +327,6 @@
     }
   });
 
-  // Actualizar el ícono del botón y reactivar controles al cambiar de estado
-  // (cubre también el caso en que el usuario sale con la tecla Esc)
   ['fullscreenchange', 'webkitfullscreenchange', 'MSFullscreenChange'].forEach(evt => {
     document.addEventListener(evt, () => {
       fullscreenBtn.textContent = estaEnFullscreen() ? '⤢' : '⛶';
@@ -340,7 +334,7 @@
     });
   });
 
-  // ============ AUTO-OCULTAR CONTROLES A LOS 2 SEGUNDOS ============
+  // ============ AUTO-OCULTAR CONTROLES ============
   let hideTimeout = null;
 
   function mostrarControles() {
@@ -350,7 +344,6 @@
   }
 
   function ocultarControles() {
-    // No ocultar si el video está pausado, cargando, o el mouse sigue sobre un control
     if (video.paused) return;
     controls.classList.add('hidden');
     videoContainer.classList.add('controls-hidden');
@@ -361,34 +354,24 @@
     hideTimeout = setTimeout(ocultarControles, 2000);
   }
 
-  // Cualquier movimiento o toque sobre el reproductor reactiva los controles
   videoContainer.addEventListener('mousemove', mostrarControles);
   videoContainer.addEventListener('touchstart', mostrarControles);
   controls.addEventListener('mousemove', mostrarControles);
 
-  // Al pausar, mantener controles visibles; al reproducir, arrancar el timer
   video.addEventListener('play', reiniciarTimerOcultar);
   video.addEventListener('pause', mostrarControles);
-
-  // Iniciar con controles visibles y su temporizador
   mostrarControles();
 
   // ============ PROTECCIONES ADICIONALES ============
-
-  // Bloquear el menú de clic derecho en toda la página
   document.addEventListener('contextmenu', (e) => e.preventDefault());
-
-  // Bloquear arrastrar el video fuera de la página
   document.addEventListener('dragstart', (e) => e.preventDefault());
-
-  // Bloquear atajos comunes de inspección
   document.addEventListener('keydown', (e) => {
     const key = e.key.toLowerCase();
     if (
       e.key === 'F12' ||
       (e.ctrlKey && e.shiftKey && (key === 'i' || key === 'j' || key === 'c')) ||
       (e.ctrlKey && key === 'u') ||
-      (e.metaKey && e.altKey && key === 'i') // Mac
+      (e.metaKey && e.altKey && key === 'i')
     ) {
       e.preventDefault();
     }
