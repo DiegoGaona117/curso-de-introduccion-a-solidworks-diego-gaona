@@ -1,40 +1,286 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Video incrustado</title>
-  <style>
-    .video-container {
-      position: relative;
-      width: 100%;
-      max-width: 800px;
-      margin: 0 auto;
-      aspect-ratio: 16 / 9;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reproductor de Video Protegido</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-user-select: none;
+    user-select: none;
+  }
 
-    .video-container iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
-      border-radius: 8px;
-    }
-  </style>
+  body {
+    background: #0f0f0f;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Arial, Helvetica, sans-serif;
+    padding: 20px;
+  }
+
+  .player-wrapper {
+    width: 100%;
+    max-width: 900px;
+    background: #1a1a1a;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  }
+
+  .video-container {
+    position: relative;
+    width: 100%;
+    background: #000;
+    min-height: 200px;
+  }
+
+  video {
+    width: 100%;
+    display: block;
+    max-height: 80vh;
+    /* Capa invisible encima evita drag & drop directo del <video> */
+    pointer-events: none;
+  }
+
+  /* Capa transparente que captura los clics reales (evita "Guardar video como") */
+  .click-shield {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    cursor: pointer;
+  }
+
+  .loading-msg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #aaa;
+    font-size: 14px;
+    z-index: 1;
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: #1a1a1a;
+    color: #fff;
+  }
+
+  button.control-btn {
+    background: #2a2a2a;
+    border: none;
+    color: #fff;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: background 0.2s ease;
+    flex-shrink: 0;
+  }
+
+  button.control-btn:hover {
+    background: #3a3a3a;
+  }
+
+  .progress-container {
+    flex: 1;
+    height: 6px;
+    background: #3a3a3a;
+    border-radius: 3px;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: #e50914;
+    border-radius: 3px;
+    position: relative;
+  }
+
+  .time-display {
+    font-size: 13px;
+    color: #ccc;
+    white-space: nowrap;
+    min-width: 90px;
+    text-align: center;
+  }
+
+  .volume-container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  input[type="range"].volume-slider {
+    width: 70px;
+    accent-color: #e50914;
+    cursor: pointer;
+  }
+</style>
 </head>
 <body>
 
-  <div class="video-container">
-    <iframe
-      src="https://www.youtube.com/embed/zB0rhHEb6Ss?si=n-Wn6tpLLDWOSy-P"
-      title="YouTube video player"
-      frameborder="0"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-      referrerpolicy="strict-origin-when-cross-origin"
-      allowfullscreen>
-    </iframe>
+<div class="player-wrapper">
+  <div class="video-container" id="videoContainer">
+    <div class="loading-msg" id="loadingMsg">Cargando video...</div>
+    <video id="miVideo" playsinline controlsList="nodownload noremoteplayback" disablePictureInPicture>
+      Tu navegador no soporta la reproducción de video.
+    </video>
+    <div class="click-shield" id="clickShield"></div>
   </div>
+
+  <div class="controls">
+    <button class="control-btn" id="playPauseBtn" title="Reproducir/Pausar">▶</button>
+
+    <div class="time-display" id="timeDisplay">00:00 / 00:00</div>
+
+    <div class="progress-container" id="progressContainer">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="volume-container">
+      <span id="volumeIcon">🔊</span>
+      <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.05" value="1">
+    </div>
+
+    <button class="control-btn" id="fullscreenBtn" title="Pantalla completa">⛶</button>
+  </div>
+</div>
+
+<script>
+  // ============ URL DE TU WORKER (proxy protegido, no R2 directo) ============
+  const VIDEO_URL = "https://red-hat-d80e.cursodiegogaona.workers.dev";
+  // ==============================================================================
+
+  const video = document.getElementById('miVideo');
+  const videoContainer = document.getElementById('videoContainer');
+  const clickShield = document.getElementById('clickShield');
+  const loadingMsg = document.getElementById('loadingMsg');
+  const playPauseBtn = document.getElementById('playPauseBtn');
+  const progressContainer = document.getElementById('progressContainer');
+  const progressBar = document.getElementById('progressBar');
+  const timeDisplay = document.getElementById('timeDisplay');
+  const volumeSlider = document.getElementById('volumeSlider');
+  const volumeIcon = document.getElementById('volumeIcon');
+  const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+  let blobUrl = null;
+
+  // --- Cargar el video como blob para que el src visible no sea la URL real ---
+  async function cargarVideo() {
+    try {
+      const respuesta = await fetch(VIDEO_URL);
+      const blob = await respuesta.blob();
+      blobUrl = URL.createObjectURL(blob);
+      video.src = blobUrl;
+      loadingMsg.style.display = 'none';
+    } catch (err) {
+      loadingMsg.textContent = 'No se pudo cargar el video.';
+      console.error(err);
+    }
+  }
+  cargarVideo();
+
+  // Liberar memoria del blob al salir de la página
+  window.addEventListener('beforeunload', () => {
+    if (blobUrl) URL.revokeObjectURL(blobUrl);
+  });
+
+  // --- Formatear tiempo ---
+  function formatTime(seconds) {
+    if (isNaN(seconds)) return "00:00";
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  }
+
+  // --- Play / Pause ---
+  function togglePlay() {
+    if (video.paused) {
+      video.play();
+      playPauseBtn.textContent = '⏸';
+    } else {
+      video.pause();
+      playPauseBtn.textContent = '▶';
+    }
+  }
+  playPauseBtn.addEventListener('click', togglePlay);
+  clickShield.addEventListener('click', togglePlay);
+
+  video.addEventListener('timeupdate', () => {
+    const percent = (video.currentTime / video.duration) * 100;
+    progressBar.style.width = `${percent}%`;
+    timeDisplay.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
+  });
+
+  video.addEventListener('loadedmetadata', () => {
+    timeDisplay.textContent = `${formatTime(0)} / ${formatTime(video.duration)}`;
+  });
+
+  video.addEventListener('ended', () => {
+    playPauseBtn.textContent = '▶';
+  });
+
+  progressContainer.addEventListener('click', (e) => {
+    const rect = progressContainer.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const percent = clickX / rect.width;
+    video.currentTime = percent * video.duration;
+  });
+
+  volumeSlider.addEventListener('input', () => {
+    video.volume = volumeSlider.value;
+    volumeIcon.textContent = video.volume == 0 ? '🔇' : (video.volume < 0.5 ? '🔉' : '🔊');
+  });
+
+  fullscreenBtn.addEventListener('click', () => {
+    if (videoContainer.requestFullscreen) {
+      videoContainer.requestFullscreen();
+    } else if (videoContainer.webkitRequestFullscreen) {
+      videoContainer.webkitRequestFullscreen();
+    } else if (videoContainer.msRequestFullscreen) {
+      videoContainer.msRequestFullscreen();
+    }
+  });
+
+  // ============ PROTECCIONES ADICIONALES ============
+
+  // Bloquear el menú de clic derecho en toda la página
+  document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+  // Bloquear arrastrar el video fuera de la página
+  document.addEventListener('dragstart', (e) => e.preventDefault());
+
+  // Bloquear atajos comunes de inspección
+  document.addEventListener('keydown', (e) => {
+    const key = e.key.toLowerCase();
+    if (
+      e.key === 'F12' ||
+      (e.ctrlKey && e.shiftKey && (key === 'i' || key === 'j' || key === 'c')) ||
+      (e.ctrlKey && key === 'u') ||
+      (e.metaKey && e.altKey && key === 'i') // Mac
+    ) {
+      e.preventDefault();
+    }
+  });
+</script>
 
 </body>
 </html>
