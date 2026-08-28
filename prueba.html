@@ -297,8 +297,12 @@
     volumeIcon.textContent = video.volume == 0 ? '🔇' : (video.volume < 0.5 ? '🔉' : '🔊');
   });
 
-  // --- Pantalla completa: se aplica al wrapper completo (video + controles superpuestos) ---
-  fullscreenBtn.addEventListener('click', () => {
+  // --- Pantalla completa: alterna entre entrar y salir (toggle) ---
+  function estaEnFullscreen() {
+    return !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
+  }
+
+  function entrarFullscreen() {
     if (playerWrapper.requestFullscreen) {
       playerWrapper.requestFullscreen();
     } else if (playerWrapper.webkitRequestFullscreen) {
@@ -306,6 +310,33 @@
     } else if (playerWrapper.msRequestFullscreen) {
       playerWrapper.msRequestFullscreen();
     }
+  }
+
+  function salirFullscreen() {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    }
+  }
+
+  fullscreenBtn.addEventListener('click', () => {
+    if (estaEnFullscreen()) {
+      salirFullscreen();
+    } else {
+      entrarFullscreen();
+    }
+  });
+
+  // Actualizar el ícono del botón y reactivar controles al cambiar de estado
+  // (cubre también el caso en que el usuario sale con la tecla Esc)
+  ['fullscreenchange', 'webkitfullscreenchange', 'MSFullscreenChange'].forEach(evt => {
+    document.addEventListener(evt, () => {
+      fullscreenBtn.textContent = estaEnFullscreen() ? '⤢' : '⛶';
+      mostrarControles();
+    });
   });
 
   // ============ AUTO-OCULTAR CONTROLES A LOS 2 SEGUNDOS ============
