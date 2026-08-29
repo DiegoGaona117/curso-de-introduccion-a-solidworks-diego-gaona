@@ -1,382 +1,316 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reproductor de Video Protegido</title>
-<style>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    -webkit-user-select: none;
-    user-select: none;
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  body {
-    background: #0f0f0f;
-    min-height: 100vh;
+    <title>Clase SolidWorks — Curso Diego Gaona</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+/* ═══════════════════════════════════════════════════════
+   VARIABLES Y RESET
+   ═══════════════════════════════════════════════════════ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+    --bg:         #0d0f14;
+    --surface:    #13161d;
+    --surface2:   #1a1e28;
+    --border:     #ffffff0f;
+    --border2:    #ffffff2e;
+    --accent:     #3b82f6;
+    --accent-dim: #3b82f620;
+    --orange:     #f97316;
+    --text:       #e8eaf0;
+    --text-muted: #ffffff;
+    --text-dim:   #9ca3af;
+    --green:      #10b981;
+    --sidebar-w:  310px;
+    --topbar-h:   58px;
+}
+
+html, body { height: 100%; overflow: hidden; }
+
+body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+}
+
+/* ── TOP BAR ── */
+.topbar {
+    height: var(--topbar-h);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-family: Arial, Helvetica, sans-serif;
-    padding: 20px;
-  }
-
-  .player-wrapper {
-    width: 100%;
-    max-width: 900px;
-    background: #000;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-  }
-
-  .player-wrapper:fullscreen,
-  .player-wrapper:-webkit-full-screen {
-    max-width: 100%;
-    width: 100%;
-    height: 100%;
-    border-radius: 0;
-  }
-
-  .player-wrapper:fullscreen .video-container,
-  .player-wrapper:-webkit-full-screen .video-container {
-    height: 100%;
-  }
-
-  .player-wrapper:fullscreen video,
-  .player-wrapper:-webkit-full-screen video {
-    height: 100%;
-    max-height: 100%;
-    object-fit: contain;
-  }
-
-  .video-container {
-    position: relative;
-    width: 100%;
-    background: #000;
-    min-height: 200px;
-  }
-
-  video {
-    width: 100%;
-    display: block;
-    max-height: 80vh;
-    pointer-events: none;
-  }
-
-  .click-shield {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 5;
-    cursor: pointer;
-  }
-
-  .loading-msg {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #aaa;
-    font-size: 14px;
-    z-index: 1;
-  }
-
-  .controls {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 10;
-    display: flex;
-    align-items: center;
+    padding: 0 20px;
     gap: 12px;
-    padding: 24px 16px 14px;
-    background: linear-gradient(to top, rgba(0,0,0,0.85), rgba(0,0,0,0));
-    color: #fff;
-    opacity: 1;
-    transform: translateY(0);
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    pointer-events: auto;
-  }
+    flex-shrink: 0;
+    z-index: 100;
+}
 
-  .controls.hidden {
-    opacity: 0;
-    transform: translateY(10px);
-    pointer-events: none;
-  }
+.topbar-brand {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.02em;
+}
+.topbar-brand span { color: var(--accent); }
 
-  .video-container.controls-hidden {
-    cursor: none;
-  }
+.topbar-sep { flex: 1; }
 
-  button.control-btn {
-    background: rgba(255,255,255,0.12);
-    border: none;
-    color: #fff;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
+.topbar-progress {
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    transition: background 0.2s ease;
-    flex-shrink: 0;
-  }
+    gap: 10px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
 
-  button.control-btn:hover {
-    background: rgba(255,255,255,0.25);
-  }
-
-  .progress-container {
-    flex: 1;
-    height: 6px;
-    background: rgba(255,255,255,0.25);
-    border-radius: 3px;
-    cursor: pointer;
-    position: relative;
-  }
-
-  .progress-bar {
+.progress-bar {
+    width: 120px;
+    height: 15px;
+    background: var(--border2);
+    border-radius: 99px;
+    overflow: hidden;
+}
+.progress-fill {
     height: 100%;
+    background: var(--orange);
+    border-radius: 99px;
+    transition: width 0.4s ease;
     width: 0%;
-    background: #e50914;
-    border-radius: 3px;
-    position: relative;
-  }
+}
 
-  .time-display {
+.btn-nav {
+    height: 34px;
+    padding: 0 14px;
+    border-radius: 7px;
+    border: 1px solid var(--border2);
+    background: transparent;
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
     font-size: 13px;
-    color: #eee;
-    white-space: nowrap;
-    min-width: 90px;
-    text-align: center;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.6);
-  }
-
-  .volume-container {
+    cursor: pointer;
     display: flex;
     align-items: center;
     gap: 6px;
-  }
+    transition: all 0.15s;
+}
+.btn-nav:hover    { background: var(--surface2); border-color: var(--border2); }
+.btn-nav:disabled { opacity: 0.3; cursor: not-allowed; }
 
-  input[type="range"].volume-slider {
-    width: 70px;
-    accent-color: #e50914;
+.btn-nav.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 500;
+}
+.btn-nav.primary:hover { background: #2563eb; border-color: #2563eb; }
+
+/* ── LAYOUT ── */
+.layout {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+    width: var(--sidebar-w);
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.sidebar-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding-top: 10px;
+}
+
+.lesson-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
     cursor: pointer;
-  }
+    background: var(--accent-dim); 
+    border-left: 2px solid var(--accent);
+}
+
+.lesson-check {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--border2);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+.lesson-check.done { background: var(--green); border-color: var(--green); }
+.lesson-check.done::after {
+    content: '';
+    width: 5px;
+    height: 8px;
+    border-right: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+    transform: rotate(45deg) translate(-1px, -1px);
+    display: block;
+}
+
+.lesson-meta { flex: 1; }
+.lesson-name { font-size: 14px; font-weight: 500; color: var(--text); }
+
+/* ── MAIN CONTENT ── */
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    background: var(--bg);
+}
+
+.content-inner {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 36px 32px 60px;
+}
+
+.lesson-title-main {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 20px;
+}
+
+/* ── VIDEO (Optimizado para Cloudflare HTML5) ── */
+.video-wrap {
+    position: relative;
+    width: 100%;
+    background: #000;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    aspect-ratio: 16/9; /* Mantiene la proporción automáticamente */
+}
+.video-wrap video {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* ── RESPONSIVE BÁSICO ── */
+@media (max-width: 768px) {
+    .sidebar { display: none; } /* Oculta sidebar en móvil para simplificar */
+    .topbar-progress { display: none; }
+    .content-inner { padding: 18px 14px 100px; }
+}
 </style>
 </head>
 <body>
 
-<div class="player-wrapper" id="playerWrapper">
-  <div class="video-container" id="videoContainer">
-    <div class="loading-msg" id="loadingMsg">Cargando video...</div>
-    <video id="miVideo" playsinline controlsList="nodownload noremoteplayback" disablePictureInPicture>
-      Tu navegador no soporta la reproducción de video.
-    </video>
-    <div class="click-shield" id="clickShield"></div>
-
-    <div class="controls" id="controls">
-      <button class="control-btn" id="playPauseBtn" title="Reproducir/Pausar">▶</button>
-
-      <div class="time-display" id="timeDisplay">00:00 / 00:00</div>
-
-      <div class="progress-container" id="progressContainer">
-        <div class="progress-bar" id="progressBar"></div>
-      </div>
-
-      <div class="volume-container">
-        <span id="volumeIcon">🔊</span>
-        <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.05" value="1">
-      </div>
-
-      <button class="control-btn" id="fullscreenBtn" title="Pantalla completa">⛶</button>
+<!-- TOP BAR -->
+<div class="topbar">
+    <div class="topbar-brand">Clase Única<span id="brandAccent"> — SolidWorks</span></div>
+    <div class="topbar-sep"></div>
+    <div class="topbar-progress">
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        <span id="progressText">0%</span>
     </div>
-  </div>
+    <button class="btn-nav primary" id="btnNext">✓ Marcar como completado</button>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="sidebar-scroll" id="sidebarScroll">
+            <!-- Renderizado dinámicamente -->
+        </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+        <div class="content-inner" id="contentInner">
+            <!-- Renderizado dinámicamente -->
+        </div>
+    </div>
 </div>
 
 <script>
-  // ============ CONFIGURACIÓN DEL WORKER ============
-  const WORKER_BASE_URL = "https://red-hat-d80e.cursodiegogaona.workers.dev";
-  const NOMBRE_DEL_VIDEO = "Activar enganche"; // El nombre de tu video en R2, sin el .mp4
-  // ====================================================
+// 1. CONFIGURACIÓN DE LA ÚNICA CLASE
+const unicaClase = { 
+    id: 1, 
+    title: "Lección en Video (Cloudflare)", 
+    videoUrl: "TU_ENLACE_DE_CLOUDFLARE_AQUI.mp4" // <-- ¡Aquí pones tu link del bucket!
+};
 
-  const playerWrapper = document.getElementById('playerWrapper');
-  const video = document.getElementById('miVideo');
-  const videoContainer = document.getElementById('videoContainer');
-  const clickShield = document.getElementById('clickShield');
-  const loadingMsg = document.getElementById('loadingMsg');
-  const controls = document.getElementById('controls');
-  const playPauseBtn = document.getElementById('playPauseBtn');
-  const progressContainer = document.getElementById('progressContainer');
-  const progressBar = document.getElementById('progressBar');
-  const timeDisplay = document.getElementById('timeDisplay');
-  const volumeSlider = document.getElementById('volumeSlider');
-  const volumeIcon = document.getElementById('volumeIcon');
-  const fullscreenBtn = document.getElementById('fullscreenBtn');
+let completado = false;
 
-  // --- Cargar la URL segura y asignarla al video ---
-  async function cargarVideo() {
-    try {
-      const peticionUrl = `${WORKER_BASE_URL}/get-video-url?video=${encodeURIComponent(NOMBRE_DEL_VIDEO)}`;
-      const respuesta = await fetch(peticionUrl);
-      
-      if (!respuesta.ok) {
-        throw new Error(`Error del servidor: ${respuesta.status}`);
-      }
+// 2. RENDERIZAR LA BARRA LATERAL (SIDEBAR)
+function renderSidebar() {
+    const sidebarEl = document.getElementById('sidebarScroll');
+    sidebarEl.innerHTML = `
+        <div class="lesson-item">
+            <div class="lesson-check ${completado ? 'done' : ''}" onclick="toggleDone()"></div>
+            <div class="lesson-meta">
+                <div class="lesson-name">${unicaClase.title}</div>
+            </div>
+        </div>
+    `;
+}
 
-      const datos = await respuesta.json();
+// 3. RENDERIZAR EL CONTENIDO PRINCIPAL (VIDEO)
+function renderContent() {
+    const el = document.getElementById('contentInner');
+    
+    el.innerHTML = `
+        <h1 class="lesson-title-main">${unicaClase.title}</h1>
+        <div class="video-wrap">
+            <!-- Reproductor HTML5 Nativo ideal para Cloudflare R2 -->
+            <video controls controlsList="nodownload">
+                <source src="${unicaClase.videoUrl}" type="video/mp4">
+                Tu navegador no soporta la etiqueta de video.
+            </video>
+        </div>
+    `;
+}
 
-      // Asignar directamente la URL al src del video
-      video.src = datos.url;
-      loadingMsg.style.display = 'none';
-      
-    } catch (err) {
-      loadingMsg.textContent = 'No se pudo cargar el video.';
-      console.error("Error al cargar el video:", err);
-    }
-  }
-  
-  cargarVideo();
+// 4. LÓGICA DE PROGRESO
+function toggleDone() {
+    completado = !completado;
+    
+    // Actualizar UI
+    document.getElementById('progressFill').style.width = completado ? '100%' : '0%';
+    document.getElementById('progressText').textContent = completado ? '100%' : '0%';
+    
+    renderSidebar(); // Refresca el icono de completado
+}
 
-  // --- Formatear tiempo ---
-  function formatTime(seconds) {
-    if (isNaN(seconds)) return "00:00";
-    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-    const s = Math.floor(seconds % 60).toString().padStart(2, '0');
-    return `${m}:${s}`;
-  }
+// Evento del botón superior
+document.getElementById('btnNext').addEventListener('click', () => {
+    if (!completado) toggleDone();
+});
 
-  // --- Play / Pause ---
-  function togglePlay() {
-    if (video.paused) {
-      video.play();
-      playPauseBtn.textContent = '⏸';
-    } else {
-      video.pause();
-      playPauseBtn.textContent = '▶';
-    }
-  }
-  playPauseBtn.addEventListener('click', togglePlay);
-  clickShield.addEventListener('click', togglePlay);
+// 5. INICIALIZAR
+renderSidebar();
+renderContent();
 
-  video.addEventListener('timeupdate', () => {
-    const percent = (video.currentTime / video.duration) * 100;
-    progressBar.style.width = `${percent}%`;
-    timeDisplay.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
-  });
-
-  video.addEventListener('loadedmetadata', () => {
-    timeDisplay.textContent = `${formatTime(0)} / ${formatTime(video.duration)}`;
-  });
-
-  video.addEventListener('ended', () => {
-    playPauseBtn.textContent = '▶';
-    mostrarControles(); 
-  });
-
-  progressContainer.addEventListener('click', (e) => {
-    const rect = progressContainer.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const percent = clickX / rect.width;
-    video.currentTime = percent * video.duration;
-  });
-
-  volumeSlider.addEventListener('input', () => {
-    video.volume = volumeSlider.value;
-    volumeIcon.textContent = video.volume == 0 ? '🔇' : (video.volume < 0.5 ? '🔉' : '🔊');
-  });
-
-  // --- Pantalla completa ---
-  function estaEnFullscreen() {
-    return !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
-  }
-
-  function entrarFullscreen() {
-    if (playerWrapper.requestFullscreen) {
-      playerWrapper.requestFullscreen();
-    } else if (playerWrapper.webkitRequestFullscreen) {
-      playerWrapper.webkitRequestFullscreen();
-    } else if (playerWrapper.msRequestFullscreen) {
-      playerWrapper.msRequestFullscreen();
-    }
-  }
-
-  function salirFullscreen() {
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    } else if (document.webkitExitFullscreen) {
-      document.webkitExitFullscreen();
-    } else if (document.msExitFullscreen) {
-      document.msExitFullscreen();
-    }
-  }
-
-  fullscreenBtn.addEventListener('click', () => {
-    if (estaEnFullscreen()) {
-      salirFullscreen();
-    } else {
-      entrarFullscreen();
-    }
-  });
-
-  ['fullscreenchange', 'webkitfullscreenchange', 'MSFullscreenChange'].forEach(evt => {
-    document.addEventListener(evt, () => {
-      fullscreenBtn.textContent = estaEnFullscreen() ? '⤢' : '⛶';
-      mostrarControles();
-    });
-  });
-
-  // ============ AUTO-OCULTAR CONTROLES ============
-  let hideTimeout = null;
-
-  function mostrarControles() {
-    controls.classList.remove('hidden');
-    videoContainer.classList.remove('controls-hidden');
-    reiniciarTimerOcultar();
-  }
-
-  function ocultarControles() {
-    if (video.paused) return;
-    controls.classList.add('hidden');
-    videoContainer.classList.add('controls-hidden');
-  }
-
-  function reiniciarTimerOcultar() {
-    clearTimeout(hideTimeout);
-    hideTimeout = setTimeout(ocultarControles, 2000);
-  }
-
-  videoContainer.addEventListener('mousemove', mostrarControles);
-  videoContainer.addEventListener('touchstart', mostrarControles);
-  controls.addEventListener('mousemove', mostrarControles);
-
-  video.addEventListener('play', reiniciarTimerOcultar);
-  video.addEventListener('pause', mostrarControles);
-  mostrarControles();
-
-  // ============ PROTECCIONES ADICIONALES ============
-  document.addEventListener('contextmenu', (e) => e.preventDefault());
-  document.addEventListener('dragstart', (e) => e.preventDefault());
-  document.addEventListener('keydown', (e) => {
-    const key = e.key.toLowerCase();
-    if (
-      e.key === 'F12' ||
-      (e.ctrlKey && e.shiftKey && (key === 'i' || key === 'j' || key === 'c')) ||
-      (e.ctrlKey && key === 'u') ||
-      (e.metaKey && e.altKey && key === 'i')
-    ) {
-      e.preventDefault();
-    }
-  });
 </script>
-
 </body>
 </html>
