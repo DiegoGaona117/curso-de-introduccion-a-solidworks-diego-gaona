@@ -40,6 +40,9 @@ body {
     color: var(--text);
     display: flex;
     flex-direction: column;
+    /* Bloquear selección de texto para mayor protección */
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 /* ── TOP BAR ── */
@@ -197,7 +200,7 @@ body {
     margin-bottom: 20px;
 }
 
-/* ── VIDEO (Optimizado para Cloudflare HTML5) ── */
+/* ── VIDEO ── */
 .video-wrap {
     position: relative;
     width: 100%;
@@ -206,7 +209,7 @@ body {
     margin-bottom: 16px;
     border: 1px solid var(--border);
     overflow: hidden;
-    aspect-ratio: 16/9; /* Mantiene la proporción automáticamente */
+    aspect-ratio: 16/9;
 }
 .video-wrap video {
     width: 100%;
@@ -216,7 +219,7 @@ body {
 
 /* ── RESPONSIVE BÁSICO ── */
 @media (max-width: 768px) {
-    .sidebar { display: none; } /* Oculta sidebar en móvil para simplificar */
+    .sidebar { display: none; }
     .topbar-progress { display: none; }
     .content-inner { padding: 18px 14px 100px; }
 }
@@ -239,30 +242,39 @@ body {
 <div class="layout">
     <!-- SIDEBAR -->
     <div class="sidebar">
-        <div class="sidebar-scroll" id="sidebarScroll">
-            <!-- Renderizado dinámicamente -->
-        </div>
+        <div class="sidebar-scroll" id="sidebarScroll"></div>
     </div>
 
     <!-- MAIN -->
     <div class="main">
-        <div class="content-inner" id="contentInner">
-            <!-- Renderizado dinámicamente -->
-        </div>
+        <div class="content-inner" id="contentInner"></div>
     </div>
 </div>
 
 <script>
-// 1. CONFIGURACIÓN DE LA ÚNICA CLASE
+// 🛡️ BLOQUEO DE CLIC DERECHO E INSPECTOR (F12)
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+document.addEventListener('keydown', e => {
+    if (
+        e.key === 'F12' || 
+        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || 
+        (e.ctrlKey && e.key === 'U')
+    ) {
+        e.preventDefault();
+        return false;
+    }
+});
+
+// CONFIGURACIÓN DE LA CLASE
 const unicaClase = { 
     id: 1, 
     title: "Lección en Video (Cloudflare)", 
-    videoUrl: "https://pub-28ab12728b934c278db2d17fd2d4d54f.r2.dev/Activar%20enganche.mp4" // <-- ¡Aquí pones tu link del bucket!
+    videoUrl: "TU_ENLACE_DE_CLOUDFLARE_AQUI.mp4"
 };
 
 let completado = false;
 
-// 2. RENDERIZAR LA BARRA LATERAL (SIDEBAR)
 function renderSidebar() {
     const sidebarEl = document.getElementById('sidebarScroll');
     sidebarEl.innerHTML = `
@@ -275,15 +287,13 @@ function renderSidebar() {
     `;
 }
 
-// 3. RENDERIZAR EL CONTENIDO PRINCIPAL (VIDEO)
 function renderContent() {
     const el = document.getElementById('contentInner');
     
     el.innerHTML = `
         <h1 class="lesson-title-main">${unicaClase.title}</h1>
         <div class="video-wrap">
-            <!-- Reproductor HTML5 Nativo ideal para Cloudflare R2 -->
-            <video controls controlsList="nodownload">
+            <video controls controlsList="nodownload" oncontextmenu="return false;">
                 <source src="${unicaClase.videoUrl}" type="video/mp4">
                 Tu navegador no soporta la etiqueta de video.
             </video>
@@ -291,26 +301,19 @@ function renderContent() {
     `;
 }
 
-// 4. LÓGICA DE PROGRESO
 function toggleDone() {
     completado = !completado;
-    
-    // Actualizar UI
     document.getElementById('progressFill').style.width = completado ? '100%' : '0%';
     document.getElementById('progressText').textContent = completado ? '100%' : '0%';
-    
-    renderSidebar(); // Refresca el icono de completado
+    renderSidebar();
 }
 
-// Evento del botón superior
 document.getElementById('btnNext').addEventListener('click', () => {
     if (!completado) toggleDone();
 });
 
-// 5. INICIALIZAR
 renderSidebar();
 renderContent();
-
 </script>
 </body>
 </html>
