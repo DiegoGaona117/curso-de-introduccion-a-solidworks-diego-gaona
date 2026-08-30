@@ -928,26 +928,22 @@ function isLessonFree(lesson) {
     return FREE_SECTIONS.includes(lesson.section);
 }
 
-// ============================================================
-// BLOQUE 18 — ARRAY "lessons" (las ~128 lecciones)
-// ============================================================
-// ============================================================
-// BLOQUE 18 — ARRAY "lessons" (12 lecciones, FreeCad)
+// BLOQUE 18 — ARRAY "lessons" (13 lecciones, FreeCad, video protegido por Worker)
 // ============================================================
 const lessons = [
-    { id:500, title:"Pieza simple 1",  dur:"3:33",  section:"Introducción a FreeCad", type:"video", videoUrl:"https://pub-28ab12728b934c278db2d17fd2d4d54f.r2.dev/FreeCad/FreeCad%20para%20PRINCIPIANTES%20_%20haz%20Pieza%20SIMPLE%201.mp4", pdfUrl:null },
-    { id:501, title:"Pieza simple 2",  dur:"3:49",  section:"Introducción a FreeCad", type:"video", videoUrl:"https://pub-28ab12728b934c278db2d17fd2d4d54f.r2.dev/FreeCad/aprende-a-hacer-pieza-simple-aprende-freecad-720-ytshorts.savetube.me.mp4", pdfUrl:null },
-    { id:502, title:"Pieza simple 3",  dur:"3:39",  section:"Introducción a FreeCad", type:"video", videoUrl:"https://pub-28ab12728b934c278db2d17fd2d4d54f.r2.dev/FreeCad/aprende-a-hacer-pieza-simple-3-aprende-freecad-720-ytshorts.savetube.me.mp4", pdfUrl:null },
-    { id:503, title:"Pieza simple 4",  dur:"4:03",  section:"Introducción a FreeCad", type:"video", videoUrl:"https://pub-28ab12728b934c278db2d17fd2d4d54f.r2.dev/FreeCad/aprende-a-hacer-pieza-simple-4-aprende-freecad-rapido-720-ytshorts.savetube.me.mp4", pdfUrl:null },
-    { id:504, title:"Pieza simple 5",  dur:"5:03",  section:"Introducción a FreeCad", type:"video", videoUrl:"https://pub-28ab12728b934c278db2d17fd2d4d54f.r2.dev/FreeCad/aprende-a-hacer-pieza-simple-5-aprende-freecad-rapido-720-ytshorts.savetube.me.mp4", pdfUrl:null },
-    { id:505, title:"Pieza simple 6",  dur:"3:53",  section:"Introducción a FreeCad", type:"video", videoUrl:"https://pub-28ab12728b934c278db2d17fd2d4d54f.r2.dev/FreeCad/aprende-a-hacer-pieza-simple-6-aprende-freecad-rapido-720-ytshorts.savetube.me.mp4", pdfUrl:null },
-    { id:506, title:"Pieza simple 7",  dur:"5:23",  section:"Introducción a FreeCad", type:"video", videoUrl:"https://pub-28ab12728b934c278db2d17fd2d4d54f.r2.dev/FreeCad/aprende-a-hacer-pieza-simple-7-aprende-freecad-rapido-720-ytshorts.savetube.me.mp4", pdfUrl:null },
-    { id:507, title:"Pieza simple 8",  dur:"7:53",  section:"Introducción a FreeCad", type:"video", videoUrl:"https://pub-28ab12728b934c278db2d17fd2d4d54f.r2.dev/FreeCad/aprende-a-hacer-pieza-simple-8-aprende-freecad-rapido-720-ytshorts.savetube.me.mp4", pdfUrl:null },
-    { id:508, title:"Pieza simple 9",  dur:"3:22",  section:"Introducción a FreeCad", type:"video", videoUrl:"https://pub-28ab12728b934c278db2d17fd2d4d54f.r2.dev/FreeCad/aprende-a-hacer-pieza-simple-9-aprende-freecad-rapido-720-ytshorts.savetube.me.mp4", pdfUrl:null },
-    { id:509, title:"Pieza simple 10", dur:"10:18", section:"Introducción a FreeCad", type:"video", videoUrl:"https://pub-28ab12728b934c278db2d17fd2d4d54f.r2.dev/FreeCad/aprende-a-hacer-pieza-simple-10-freecad-para-principiantes-720-ytshorts.savetube.me.mp4", pdfUrl:null },
-    { id:510, title:"Pieza simple 11", dur:"5:36",  section:"Introducción a FreeCad", type:"video", videoUrl:"https://pub-28ab12728b934c278db2d17fd2d4d54f.r2.dev/FreeCad/aprende-a-hacer-pieza-simple-11-freecad-para-principiantes-720-ytshorts.savetube.me.mp4", pdfUrl:null },
-    { id:511, title:"Pieza simple 12", dur:"5:05",  section:"Introducción a FreeCad", type:"video", videoUrl:"https://pub-28ab12728b934c278db2d17fd2d4d54f.r2.dev/FreeCad/aprende-a-hacer-pieza-simple-12-freecad-para-principiantes-720-ytshorts.savetube.me.mp4", pdfUrl:null },
-    { id:512, title:"Pieza simple 13", dur:"4:19",  section:"Introducción a FreeCad", type:"video", videoUrl:"https://pub-28ab12728b934c278db2d17fd2d4d54f.r2.dev/FreeCad/aprende-a-hacer-pieza-simple-13-freecad-para-principiantes-720-ytshorts.savetube.me.mp4", pdfUrl:null }
+    { id:500, title:"Pieza simple 1",  dur:"3:33",  section:"Introducción a FreeCad", type:"video", videoId:"FreeCad/FreeCad para PRINCIPIANTES _ haz Pieza SIMPLE 1", pdfUrl:null },
+    { id:501, title:"Pieza simple 2",  dur:"3:49",  section:"Introducción a FreeCad", type:"video", videoId:"FreeCad/aprende-a-hacer-pieza-simple-aprende-freecad-720-ytshorts.savetube.me", pdfUrl:null },
+    { id:502, title:"Pieza simple 3",  dur:"3:39",  section:"Introducción a FreeCad", type:"video", videoId:"FreeCad/aprende-a-hacer-pieza-simple-3-aprende-freecad-720-ytshorts.savetube.me", pdfUrl:null },
+    { id:503, title:"Pieza simple 4",  dur:"4:03",  section:"Introducción a FreeCad", type:"video", videoId:"FreeCad/aprende-a-hacer-pieza-simple-4-aprende-freecad-rapido-720-ytshorts.savetube.me", pdfUrl:null },
+    { id:504, title:"Pieza simple 5",  dur:"5:03",  section:"Introducción a FreeCad", type:"video", videoId:"FreeCad/aprende-a-hacer-pieza-simple-5-aprende-freecad-rapido-720-ytshorts.savetube.me", pdfUrl:null },
+    { id:505, title:"Pieza simple 6",  dur:"3:53",  section:"Introducción a FreeCad", type:"video", videoId:"FreeCad/aprende-a-hacer-pieza-simple-6-aprende-freecad-rapido-720-ytshorts.savetube.me", pdfUrl:null },
+    { id:506, title:"Pieza simple 7",  dur:"5:23",  section:"Introducción a FreeCad", type:"video", videoId:"FreeCad/aprende-a-hacer-pieza-simple-7-aprende-freecad-rapido-720-ytshorts.savetube.me", pdfUrl:null },
+    { id:507, title:"Pieza simple 8",  dur:"7:53",  section:"Introducción a FreeCad", type:"video", videoId:"FreeCad/aprende-a-hacer-pieza-simple-8-aprende-freecad-rapido-720-ytshorts.savetube.me", pdfUrl:null },
+    { id:508, title:"Pieza simple 9",  dur:"3:22",  section:"Introducción a FreeCad", type:"video", videoId:"FreeCad/aprende-a-hacer-pieza-simple-9-aprende-freecad-rapido-720-ytshorts.savetube.me", pdfUrl:null },
+    { id:509, title:"Pieza simple 10", dur:"10:18", section:"Introducción a FreeCad", type:"video", videoId:"FreeCad/aprende-a-hacer-pieza-simple-10-freecad-para-principiantes-720-ytshorts.savetube.me", pdfUrl:null },
+    { id:510, title:"Pieza simple 11", dur:"5:36",  section:"Introducción a FreeCad", type:"video", videoId:"FreeCad/aprende-a-hacer-pieza-simple-11-freecad-para-principiantes-720-ytshorts.savetube.me", pdfUrl:null },
+    { id:511, title:"Pieza simple 12", dur:"5:05",  section:"Introducción a FreeCad", type:"video", videoId:"FreeCad/aprende-a-hacer-pieza-simple-12-freecad-para-principiantes-720-ytshorts.savetube.me", pdfUrl:null },
+    { id:512, title:"Pieza simple 13", dur:"4:19",  section:"Introducción a FreeCad", type:"video", videoId:"FreeCad/aprende-a-hacer-pieza-simple-13-freecad-para-principiantes-720-ytshorts.savetube.me", pdfUrl:null }
 ];
 
 // ============================================================
@@ -996,6 +992,18 @@ function ytEmbed(url) {
     if (url.includes('watch?v=')) id = url.split('watch?v=')[1].split('&')[0];
     else if (url.includes('youtu.be/')) id = url.split('youtu.be/')[1].split('?')[0];
     return id ? `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1` : null;
+}
+
+// ============================================================
+// BLOQUE 20B — WORKER DE VIDEOS FIRMADOS (Cloudflare)
+// ============================================================
+const VIDEO_WORKER_URL = 'https://red-hat-d80e.cursodiegogaona.workers.dev'; // ⚠️ reemplaza con tu URL real
+
+async function obtenerVideoFirmado(videoId) {
+    const res = await fetch(`${VIDEO_WORKER_URL}/get-video-url?video=${encodeURIComponent(videoId)}`);
+    if (!res.ok) throw new Error('No se pudo obtener la URL del video');
+    const data = await res.json();
+    return data.url;
 }
 
 // ============================================================
@@ -1224,6 +1232,40 @@ function renderContent() {
     }
 
     el.innerHTML = html;
+
+    requestAnimationFrame(applyVideoScale);
+}
+
+    // ============================================================
+// BLOQUE 24B — CARGA DE VIDEO FIRMADO (Worker)
+// ============================================================
+async function cargarVideoFirmado(videoId) {
+    const video = document.getElementById('playerVideo');
+    if (!video) return;
+
+    try {
+        const url = await obtenerVideoFirmado(videoId);
+        video.src = url;
+
+        // Si el enlace firmado expira mientras el alumno sigue viendo
+        // (videos largos, o el navegador pide un tramo nuevo del video),
+        // el <video> dispara 'error'. Pedimos una URL nueva y reanudamos
+        // desde el mismo punto donde se quedó.
+        video.addEventListener('error', async () => {
+            const tiempoActual = video.currentTime;
+            try {
+                const nuevaUrl = await obtenerVideoFirmado(videoId);
+                video.src = nuevaUrl;
+                video.currentTime = tiempoActual;
+                video.play().catch(() => {});
+            } catch (e) {
+                console.error('No se pudo renovar el video firmado:', e);
+            }
+        }, { once: true });
+
+    } catch (err) {
+        console.error('Error al pedir video firmado:', err);
+    }
 
     requestAnimationFrame(applyVideoScale);
 }
