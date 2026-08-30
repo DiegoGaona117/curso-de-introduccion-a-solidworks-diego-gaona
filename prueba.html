@@ -355,7 +355,7 @@ body {
     max-width: 100%;
     aspect-ratio: 16 / 9;
     overflow: hidden;
-    background: var(--surface);
+    background: #000;
     border-radius: 10px;
     margin-bottom: 16px;
     border: 1px solid var(--border);
@@ -364,6 +364,12 @@ body {
     width: 100%;
     height: 100%;
     border: none;
+    display: block;
+}
+
+.video-wrap video {
+    width: 100%;
+    height: 100%;
     display: block;
 }
 
@@ -926,7 +932,7 @@ function isLessonFree(lesson) {
 // BLOQUE 18 — ARRAY "lessons" (las ~128 lecciones)
 // ============================================================
 const lessons = [
-    { id:0,  title:"Pieza simple 1", dur:"", section:"Vista previa gratuita",  type:"video", videoUrl:"https://pub-28ab12728b934c278db2d17fd2d4d54f.r2.dev/FreeCad/FreeCad%20para%20PRINCIPIANTES%20_%20haz%20Pieza%20SIMPLE%201.mp4", pdfUrl:null }, // FreeCad para PRINCIPIANTES _ haz Pieza SIMPLE 1.mp4
+    { id:0,  title:"Pieza simple 1", dur:"", section:"Introducción a FreeCad",  type:"video", videoUrl:"https://pub-28ab12728b934c278db2d17fd2d4d54f.r2.dev/FreeCad/FreeCad%20para%20PRINCIPIANTES%20_%20haz%20Pieza%20SIMPLE%201.mp4", pdfUrl:null }, // FreeCad para PRINCIPIANTES _ haz Pieza SIMPLE 1.mp4
     { id:1,  title:"Pieza simple 2", dur:"", section:"Introducción a FreeCad", type:"video", videoUrl:"https://pub-28ab12728b934c278db2d17fd2d4d54f.r2.dev/FreeCad/aprende-a-hacer-pieza-simple-aprende-freecad-ytshorts.savetube.vip.mp4", pdfUrl:null }, // aprende-a-hacer-pieza-simple-aprende-freecad-ytshorts.savetube.vip.mp4
     { id:2,  title:"Pieza simple 3", dur:"", section:"Introducción a FreeCad", type:"video", videoUrl:"https://pub-28ab12728b934c278db2d17fd2d4d54f.r2.dev/FreeCad/aprende-a-hacer-pieza-simple-3-aprende-freecad-ytshorts.savetube.vip.mp4", pdfUrl:null }, // aprende-a-hacer-pieza-simple-3-aprende-freecad-ytshorts.savetube.vip.mp4
     { id:3,  title:"Pieza simple 4", dur:"", section:"Introducción a FreeCad", type:"video", videoUrl:"https://pub-28ab12728b934c278db2d17fd2d4d54f.r2.dev/FreeCad/aprende-a-hacer-pieza-simple-4-aprende-freecad-rapido-ytshorts.savetube.vip.mp4", pdfUrl:null }, // aprende-a-hacer-pieza-simple-4-aprende-freecad-rapido-ytshorts.savetube.vip.mp4
@@ -1172,12 +1178,16 @@ function renderContent() {
         return;
     }
 
-    // ── VIDEO ──
+        // ── VIDEO ──
+    const esVideoDirecto = l.videoUrl && /\.(mp4|webm|ogg)(\?.*)?$/i.test(l.videoUrl);
+
     let embed = null;
-    if (l.videoUrl && l.videoUrl.includes('drive.google.com')) {
-        embed = l.videoUrl;
-    } else {
-        embed = ytEmbed(l.videoUrl);
+    if (!esVideoDirecto) {
+        if (l.videoUrl && l.videoUrl.includes('drive.google.com')) {
+            embed = l.videoUrl;
+        } else {
+            embed = ytEmbed(l.videoUrl);
+        }
     }
 
     let html = `<h1 class="lesson-title-main">${l.title}</h1>`;
@@ -1186,7 +1196,15 @@ function renderContent() {
         html += `<p style="font-size:14px; color:var(--text-dim); line-height:1.8; margin-bottom:20px;">${l.desc}</p>`;
     }
 
-    if (embed) {
+    if (esVideoDirecto) {
+        html += `
+            <div class="video-wrap">
+                <video controls controlsList="nodownload" oncontextmenu="return false;">
+                    <source src="${l.videoUrl}" type="video/mp4">
+                    Tu navegador no soporta la etiqueta de video.
+                </video>
+            </div>`;
+    } else if (embed) {
         html += `
             <div class="video-wrap">
                 <iframe src="${embed}" allowfullscreen></iframe>
