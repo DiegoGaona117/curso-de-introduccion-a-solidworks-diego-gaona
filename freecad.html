@@ -660,12 +660,13 @@ body.light {
     .lesson-check { width: 22px; height: 22px; }
     .lesson-name  { font-size: 13px; }
 
-    /* ── VIDEO EN MÓVIL ──
-       El iframe se renderiza en su ancho real (VIDEO_MIN_W) y JS aplica
-       CSS zoom para encajarlo en el contenedor. zoom sí escala el
-       coordinate space del iframe → los eventos touch llegan correctos
-       (a diferencia de transform:scale que los desalinea). */
-    .video-wrap {
+        /* ── VIDEO EN MÓVIL ──
+       Este hack (achatar el contenedor y reposicionar con position:absolute)
+       SOLO aplica a los reproductores con <iframe> (Google Drive / YouTube),
+       porque ahí es donde ocurre el bug de coordenadas táctiles.
+       El <video> nativo (Cloudflare Worker) no tiene ese bug, así que
+       conserva su aspect-ratio normal y no se le aplica este achatado. */
+    .video-wrap:has(iframe) {
         aspect-ratio: unset;
         padding-bottom: 72%;
         height: 0;
