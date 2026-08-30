@@ -953,13 +953,16 @@ const lessons = [
 // ============================================================
 // BLOQUE 19 — STATE (localStorage pieza_idx / pieza_done)
 // ============================================================
+// ============================================================
+// BLOQUE 19 — STATE (localStorage freecad_idx / freecad_done)
+// ============================================================
 let currentIdx = 0;
 let completed = new Set();
 
 function loadState() {
     try {
-        const i = localStorage.getItem('pieza_idx');
-        const c = localStorage.getItem('pieza_done');
+        const i = localStorage.getItem('freecad_idx');
+        const c = localStorage.getItem('freecad_done');
         if (i) currentIdx = Math.min(parseInt(i), lessons.length - 1);
         if (c) completed = new Set(JSON.parse(c));
     } catch {}
@@ -967,8 +970,8 @@ function loadState() {
 
 function saveState() {
     try {
-        localStorage.setItem('pieza_idx', currentIdx);
-        localStorage.setItem('pieza_done', JSON.stringify([...completed]));
+        localStorage.setItem('freecad_idx', currentIdx);
+        localStorage.setItem('freecad_done', JSON.stringify([...completed]));
     } catch {}
 }
 
@@ -984,7 +987,6 @@ function getLessonFromURL() {
 function pushURL(idx) {
     history.pushState({ idx }, '', `?l=${lessons[idx].id}`);
 }
-
 // ============================================================
 // BLOQUE 20 — YOUTUBE EMBED HELPER
 // ============================================================
