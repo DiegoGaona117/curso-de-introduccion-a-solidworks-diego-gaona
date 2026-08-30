@@ -1190,41 +1190,44 @@ function renderContent() {
         return;
     }
 
-        // ── VIDEO ──
-    const esVideoDirecto = l.videoUrl && /\.(mp4|webm|ogg)(\?.*)?$/i.test(l.videoUrl);
-
-    let embed = null;
-    if (!esVideoDirecto) {
-        if (l.videoUrl && l.videoUrl.includes('drive.google.com')) {
-            embed = l.videoUrl;
-        } else {
-            embed = ytEmbed(l.videoUrl);
-        }
-    }
-
+    // ── VIDEO ──
     let html = `<h1 class="lesson-title-main">${l.title}</h1>`;
 
     if (l.desc) {
         html += `<p style="font-size:14px; color:var(--text-dim); line-height:1.8; margin-bottom:20px;">${l.desc}</p>`;
     }
 
-    if (esVideoDirecto) {
+    if (l.videoId) {
+        // Video protegido: se sirve mediante URL firmada del Worker (con vencimiento)
         html += `
             <div class="video-wrap">
-                <video controls controlsList="nodownload" oncontextmenu="return false;">
-                    <source src="${l.videoUrl}" type="video/mp4">
+                <video id="playerVideo" controls controlsList="nodownload" oncontextmenu="return false;" preload="none">
                     Tu navegador no soporta la etiqueta de video.
                 </video>
             </div>`;
-    } else if (embed) {
-        html += `
-            <div class="video-wrap">
-                <iframe src="${embed}" allowfullscreen></iframe>
-            </div>
-            <div class="hd-tip">
-                <span>💡</span>
-                <div>Para mejor calidad, reproduce el video en <strong>Full HD (1080p)</strong>. Haz clic en el ícono de configuración del video ⚙️ → Calidad → 1080p.</div>
-            </div>`;
+    } else if (l.videoUrl) {
+        const esVideoDirecto = /\.(mp4|webm|ogg)(\?.*)?$/i.test(l.videoUrl);
+        if (esVideoDirecto) {
+            html += `
+                <div class="video-wrap">
+                    <video controls controlsList="nodownload" oncontextmenu="return false;">
+                        <source src="${l.videoUrl}" type="video/mp4">
+                        Tu navegador no soporta la etiqueta de video.
+                    </video>
+                </div>`;
+        } else {
+            const embed = l.videoUrl.includes('drive.google.com') ? l.videoUrl : ytEmbed(l.videoUrl);
+            if (embed) {
+                html += `
+                    <div class="video-wrap">
+                        <iframe src="${embed}" allowfullscreen></iframe>
+                    </div>
+                    <div class="hd-tip">
+                        <span>💡</span>
+                        <div>Para mejor calidad, reproduce el video en <strong>Full HD (1080p)</strong>. Haz clic en el ícono de configuración del video ⚙️ → Calidad → 1080p.</div>
+                    </div>`;
+            }
+        }
     }
 
     if (l.pdfUrl) {
@@ -1233,7 +1236,11 @@ function renderContent() {
 
     el.innerHTML = html;
 
-    requestAnimationFrame(applyVideoScale);
+    if (l.videoId) {
+        cargarVideoFirmado(l.videoId);
+    } else {
+        requestAnimationFrame(applyVideoScale);
+    }
 }
 
     // ============================================================
