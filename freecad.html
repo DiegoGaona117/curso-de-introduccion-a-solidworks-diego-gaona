@@ -1201,7 +1201,7 @@ function renderContent() {
         // Video protegido: se sirve mediante URL firmada del Worker (con vencimiento)
         html += `
             <div class="video-wrap">
-                <video id="playerVideo" controls controlsList="nodownload" oncontextmenu="return false;" preload="none">
+                <video id="playerVideo" controls controlsList="nodownload" oncontextmenu="return false;" preload="metadata">
                     Tu navegador no soporta la etiqueta de video.
                 </video>
             </div>`;
